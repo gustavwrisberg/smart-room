@@ -4,21 +4,22 @@ The room is five Home Assistant packages in [`home-assistant/packages/`](../home
 Every automation only runs while `input_boolean.living_room_auto` is on.
 
 ```
- Room Sensor (corner)  ──┐                       ┌── lights (KAJPLATS, Thread)
-   LD2410C, SHT40, lux   │   Home Assistant      ├── blind (cover)
-                         ├── living_room_core ───┼── radiator (LILJEBAGGE + Better Thermostat)
- Room Panel (door)    ───┘   presence, window,   ├── vacuum (Roborock)
-   C4002, SHT40, CO2,        night mode, scripts └── panel display (temperature, CO₂, price)
-   knob + 4 buttons ──────── calls scripts ─────────┘
+ Room Panel (by the door)                         ┌── lights (KAJPLATS, Thread)
+   C4002 radar, SHT40,  ──── Home Assistant ──────┼── blind (cover)
+   BH1750, SCD40*,           living_room_core:    ├── radiator (LILJEBAGGE + Better Thermostat)
+   e-paper*                  presence, window,    ├── vacuum (Roborock)
+   knob + 4 buttons ──────── night mode, scripts  └── panel display* (temperature, CO₂, price)
+
+ * optional: the panel works without the screen and/or the CO₂ sensor
 ```
 
 ## Presence – `living_room_core.yaml`
 
-`binary_sensor.living_room_occupied` is on when **either radar** sees someone. The corner
-sensor covers the sofa and the room diagonally; the panel covers the door. Off is delayed
-2 minutes, so a still reader on the sofa does not lose the lights.
+`binary_sensor.living_room_occupied` follows the Room Panel's C4002 radar, which sees moving
+and still people across the room from its spot by the door. Off is delayed 2 minutes, so
+a still reader on the sofa does not lose the lights.
 
-While the vacuum is cleaning, the radars see the robot, so presence is ignored. If you
+While the vacuum is cleaning, the radar sees the robot, so presence is ignored. If you
 walk in during a clean, press any panel button: the robot goes home and presence works again.
 
 ## Lights – `living_room_lights.yaml`
@@ -61,13 +62,13 @@ target once the room has stopped cooling for 10 minutes.
 
 ## Windows – `living_room_core.yaml`
 
-No contact sensors. `binary_sensor.living_room_window_open` is on if either:
+No contact sensors. `binary_sensor.living_room_window_open` is on when the panel's
+temperature falls faster than 0.3 °C per minute (a *derivative* sensor over 2 minutes; the
+panel reads its SHT40 every 10 s). It stays on until the temperature has been stable for
+10 minutes.
 
-- the Room Sensor's own ESPHome flag fires (more than 0.8 °C colder than 5 minutes ago), or
-- the panel's temperature falls faster than 0.3 °C per minute (a *derivative* sensor over 2 minutes).
-
-It stays on until the temperature has been stable for 10 minutes. Above 1000 ppm CO₂ for
-10 minutes while someone is home, Home Assistant suggests airing out.
+On a panel with the CO₂ sensor, above 1000 ppm for 10 minutes while someone is home, Home
+Assistant suggests airing out (the screen shows "Air out!" too).
 
 ## Day and night – `living_room_core.yaml`
 

@@ -9,7 +9,7 @@ only the Roborock needs its cloud once for sign-in and as a fallback.
 | 2 | **OpenThread Border Router** add-on | Turns the ZBT-2 into a Thread border router | Installed automatically when you plug in the ZBT-2 and pick *Thread* |
 | 3 | **Matter Server** add-on + **Matter** integration | Commissions and controls the IKEA bulbs and the LILJEBAGGE | Settings → Devices & services → Add → Matter |
 | 4 | **Thread** integration | Shows the Thread network; set Home Assistant's network as preferred | Settings → Devices & services → Thread |
-| 5 | **ESPHome Device Builder** add-on + **ESPHome** integration | Builds and flashes the Room Sensor and Room Panel firmware; brings them into HA | Add-on store |
+| 5 | **ESPHome Device Builder** add-on + **ESPHome** integration | Builds and flashes the Room Panel firmware; brings it into HA | Add-on store |
 | 6 | **HACS** | Community store for the next two | [hacs.xyz](https://hacs.xyz) |
 | 7 | **Better Thermostat** (HACS) | Wraps the LILJEBAGGE so it regulates on the panel's room temperature | HACS → Integrations |
 | 8 | **Energi Data Service** (HACS) | Hourly Danish spot price incl. tariffs, shown on the panel's e-paper | HACS → Integrations |
@@ -20,17 +20,15 @@ only the Roborock needs its cloud once for sign-in and as a fallback.
 Built into Home Assistant and used by the packages (nothing to install): template,
 derivative, light group, input helpers, timer, sun, script, automation.
 
-## Firmware for the two devices
+## Room Panel firmware
 
-Both device configs in [`esphome/`](../esphome/) pull the firmware straight from the device
-repos as ESPHome remote packages, so you only keep the room-specific names here:
+[`esphome/living-room-panel.yaml`](../esphome/living-room-panel.yaml) pulls the firmware
+straight from [room-panel/firmware/living-room-panel.yaml](https://github.com/gustavwrisberg/room-panel/blob/main/firmware/living-room-panel.yaml)
+as an ESPHome remote package (it uses DFRobot's `dfrobot_c4002` external component), so
+only the room-specific names live here. For a panel without the screen, include
+[`esphome/options/no-screen.yaml`](../esphome/options/no-screen.yaml) (one line to uncomment).
 
-| Device | Config here | Firmware source |
-| --- | --- | --- |
-| Room Sensor Lite | `esphome/living-room-sensor.yaml` | [room-sensor/firmware/room-sensor-lite.yaml](https://github.com/gustavwrisberg/room-sensor/blob/main/firmware/room-sensor-lite.yaml) |
-| Room Panel | `esphome/living-room-panel.yaml` | [room-panel/firmware/living-room-panel.yaml](https://github.com/gustavwrisberg/room-panel/blob/main/firmware/living-room-panel.yaml) (uses DFRobot's `dfrobot_c4002` external component) |
-
-Validated with ESPHome 2026.11 (`esphome config`).
+The full and the no-screen builds both validate with ESPHome 2026.11 (`esphome config`).
 
 ## Only for the 3D model
 
@@ -38,4 +36,4 @@ Validated with ESPHome 2026.11 (`esphome config`).
 | --- | --- |
 | Python 3.11+ with `manifold3d trimesh numpy` | `models/build_room.py` |
 | Blender / any glTF viewer | Opening `room.glb` and the part GLBs |
-| A slicer (PrusaSlicer, Bambu Studio, Cura) | Printing the device cases from their repos |
+| A slicer (PrusaSlicer, Bambu Studio, Cura) | Printing the Room Panel case from its repo |

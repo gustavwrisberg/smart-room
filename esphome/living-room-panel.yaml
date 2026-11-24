@@ -1,11 +1,17 @@
-# Living room - Room Panel (by the door, 1.4 m)
+# Living room - Room Panel (by the door, 1.4 m). The only device in the room.
 # Hardware + full firmware: https://github.com/gustavwrisberg/room-panel
 #
 # The firmware is pulled from the room-panel repo. The substitutions below point
 # the knob, buttons and display at the entities and scripts this repo creates in
 # home-assistant/packages/.
 #
-#   esphome run living-room-panel.yaml
+# Build options - fit only what the room needs:
+#   full panel          radar, temp/humidity, light, CO2, e-paper, knob + buttons (as is)
+#   without CO2 sensor  just leave the SCD40 breakout off J4; nothing to change here.
+#                       The CO2 entity stays "unavailable" and the screen skips it.
+#   without the screen  leave the display off J3 and uncomment the no_screen line below.
+#
+#   esphome run living-room-panel.yaml       (first time over USB-C, then OTA)
 # Then in Home Assistant: Settings > Devices & services > ESPHome > Living Room Panel >
 # Configure > tick "Allow the device to perform Home Assistant actions".
 
@@ -13,7 +19,7 @@ substitutions:
   name: living-room-panel
   friendly_name: Living Room Panel
   light_entity: light.living_room                 # light group, packages/living_room_core.yaml
-  blind_entity: cover.living_room_blinds          # motorised pleated blind
+  blind_entity: cover.living_room_blinds          # motorised blind
   scene_script: script.living_room_scene_next     # scene button, short press
   auto_script: script.living_room_auto            # scene button, long press: back to automatic
   away_script: script.living_room_all_off         # all-off button, short press
@@ -22,3 +28,4 @@ substitutions:
 
 packages:
   room_panel: github://gustavwrisberg/room-panel/firmware/living-room-panel.yaml@main
+  # no_screen: !include options/no-screen.yaml

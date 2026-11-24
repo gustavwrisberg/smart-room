@@ -1,9 +1,7 @@
 Group,Item,Product used in this example,Qty,Approx unit price EUR,Approx total EUR,Connects via,Notes
 Hub,Home Assistant server,Home Assistant Green (or a used mini PC),1,110,110,Ethernet,Already have one? Skip.
 Hub,Thread radio,Home Assistant Connect ZBT-2 (Thread firmware / OpenThread Border Router),1,45,45,USB,Use the USB extension cable; keep it away from the server's USB 3 ports
-Room devices,Presence + temp + humidity + light (corner),Room Sensor Lite - github.com/gustavwrisberg/room-sensor,1,20,20,Wi-Fi (ESPHome),~$22 assembled board at 5 pcs + case print + 2 x M3x12
-Room devices,Wall panel with radar + CO2 + e-paper + controls,Room Panel - github.com/gustavwrisberg/room-panel,1,67,67,Wi-Fi (ESPHome),~$78 per panel incl. display and CO2 breakout
-Room devices,USB-C charger + cable for the Room Sensor,Any 5 V 1 A USB charger,1,6,6,-,The panel's charger is in its own BOM
+Room device,Room Panel: radar presence + temp/humidity + light + CO2 + e-paper + knob and buttons,Room Panel - github.com/gustavwrisberg/room-panel (full build),1,67,67,Wi-Fi (ESPHome),~$78. Without screen ~€49; without CO2 ~€49; without both ~€32 (see docs/shopping-list.md)
 Lights,Smart bulb,IKEA KAJPLATS E27 colour and white spectrum,2,12,24,Matter over Thread,Mains-powered: also strengthens the Thread mesh
 Lights,Ceiling pendant + floor lamp,Any E27 lamps,2,-,-,-,Keep the wall switches on
 Heating,Smart radiator thermostat,IKEA LILJEBAGGE,1,15,15,Matter over Thread,M30 x 1.5 valve; adapters for Danfoss RA etc. in the box or sold separately

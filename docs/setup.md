@@ -24,31 +24,36 @@ join (a common tip with the KAJPLATS bulbs).
 | KAJPLATS in the floor lamp | Living Room | `light.living_room_floor_lamp` |
 | LILJEBAGGE on the radiator | Living Room | `climate.living_room_trv` |
 
-## 3. Room Sensor and Room Panel
+## 3. Room Panel
 
-1. Build both devices following their repos.
+The Room Panel is the only sensor in the room: presence, temperature, humidity, light and
+(optionally) CO₂, plus the knob, buttons and screen.
+
+1. Build the panel following [its repo](https://github.com/gustavwrisberg/room-panel). Decide
+   on the build first ([options](shopping-list.md#room-panel-build-only-what-the-room-needs)):
+   full, without the screen, without CO₂, or without both.
 2. Copy `esphome/secrets.example.yaml` to `esphome/secrets.yaml` and fill it in
    (`openssl rand -base64 32` for the API key).
-3. Put `living-room-sensor.yaml`, `living-room-panel.yaml` and `secrets.yaml` in the ESPHome
-   Device Builder (or run `esphome run living-room-sensor.yaml` on your PC). The first flash
+3. No screen fitted? In `esphome/living-room-panel.yaml` uncomment
+   `no_screen: !include options/no-screen.yaml`. No CO₂ sensor? Nothing to change.
+4. Put `living-room-panel.yaml`, the `options/` folder and `secrets.yaml` in the ESPHome
+   Device Builder (or run `esphome run living-room-panel.yaml` on your PC). The first flash
    is over USB-C, after that over Wi-Fi.
-4. Adopt both in Settings → Devices & services → ESPHome and put them in the **Living Room**
-   area.
-5. On the **Living Room Panel** device: Configure → tick **Allow the device to perform Home
+5. Adopt it in Settings → Devices & services → ESPHome and put it in the **Living Room** area.
+6. On the **Living Room Panel** device: Configure → tick **Allow the device to perform Home
    Assistant actions**. Without it the knob and buttons do nothing.
-6. Mount: the sensor in a corner at about 2.1 m on its 45° corner mount, the panel at
-   1.4 m next to the door.
+7. Mount it at 1.4 m next to the door, where its radar sees the whole room (nothing
+   metal in front of it; avoid pointing it straight at the radiator or curtains that move).
 
-The ESPHome device names give these entity ids, which the packages use as they are:
+The ESPHome device name gives these entity ids, which the packages use as they are:
 
 | Entity | From |
 | --- | --- |
-| `binary_sensor.living_room_sensor_presence` | Room Sensor (LD2410C) |
-| `binary_sensor.living_room_sensor_window_open_temperature_drop` | Room Sensor (temperature drop in ESPHome) |
-| `sensor.living_room_sensor_illuminance` | Room Sensor (BH1750) |
-| `binary_sensor.living_room_panel_presence` | Room Panel (C4002) |
-| `sensor.living_room_panel_temperature`, `sensor.living_room_panel_co2` | Room Panel (SHT40, SCD40) |
-| `binary_sensor.living_room_panel_button_*` | Room Panel buttons |
+| `binary_sensor.living_room_panel_presence` | C4002 radar |
+| `sensor.living_room_panel_temperature`, `sensor.living_room_panel_humidity` | SHT40 |
+| `sensor.living_room_panel_illuminance` | BH1750 |
+| `sensor.living_room_panel_co2` | SCD40 (unavailable on a build without it) |
+| `binary_sensor.living_room_panel_button_*` | The four buttons |
 
 ## 4. Better Thermostat
 
@@ -94,8 +99,8 @@ No room mapping? In `living_room_vacuum.yaml` replace the `vacuum.clean_area` ac
 
 | What | Where | Start with |
 | --- | --- | --- |
-| Temperature offset of each device | `temp_offset` in the ESPHome yaml / Better Thermostat calibration | Compare with a thermometer for an hour |
-| Radar gates and timeouts | The LD2410 and C4002 entities in Home Assistant | Run the panel's *Radar calibrate room* switch with the room empty |
+| Temperature offset | Better Thermostat calibration | Compare the panel with a thermometer for an hour |
+| Radar | The C4002 entities in Home Assistant | Run the panel's *Radar calibrate room* switch with the room empty |
 | When it counts as dark | `input_number.living_room_dark_lux` | 30 lx |
 | Comfort / eco / night temperatures | `input_number.living_room_*_temp` | 21 / 19 / 18 °C |
 | Morning and night times | `input_datetime.morning_starts`, `night_starts` | 07:00, 23:00 (the defaults are set in `living_room_core.yaml`) |

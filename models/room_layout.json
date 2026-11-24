@@ -1186,123 +1186,9 @@
    ]
   },
   {
-   "name": "room_sensor_base",
-   "group": "devices",
-   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
-   "wall": null,
-   "file": "devices/ (from your device repo)",
-   "size_mm": [
-    76.2,
-    28.7,
-    14.6
-   ],
-   "transform_mm": [
-    [
-     0.7071,
-     0.0,
-     -0.7071,
-     4500.0
-    ],
-    [
-     -0.7071,
-     0.0,
-     -0.7071,
-     3600.0
-    ],
-    [
-     0.0,
-     1.0,
-     0.0,
-     2150.0
-    ],
-    [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ]
-   ]
-  },
-  {
-   "name": "room_sensor_lid",
-   "group": "devices",
-   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
-   "wall": null,
-   "file": "devices/ (from your device repo)",
-   "size_mm": [
-    76.2,
-    28.7,
-    9.5
-   ],
-   "transform_mm": [
-    [
-     0.7071,
-     0.0,
-     -0.7071,
-     4500.0
-    ],
-    [
-     -0.7071,
-     0.0,
-     -0.7071,
-     3600.0
-    ],
-    [
-     0.0,
-     1.0,
-     0.0,
-     2150.0
-    ],
-    [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ]
-   ]
-  },
-  {
-   "name": "room_sensor_corner_mount",
-   "group": "devices",
-   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
-   "wall": null,
-   "file": "devices/ (from your device repo)",
-   "size_mm": [
-    64.0,
-    45.0,
-    36.9
-   ],
-   "transform_mm": [
-    [
-     0.7071,
-     0.0,
-     -0.7071,
-     4500.0
-    ],
-    [
-     -0.7071,
-     0.0,
-     -0.7071,
-     3600.0
-    ],
-    [
-     0.0,
-     1.0,
-     0.0,
-     2150.0
-    ],
-    [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ]
-   ]
-  },
-  {
    "name": "room_panel_front_shell",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1340,7 +1226,7 @@
   {
    "name": "room_panel_back_plate",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1378,7 +1264,7 @@
   {
    "name": "room_panel_button_1",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1416,7 +1302,7 @@
   {
    "name": "room_panel_button_2",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1454,7 +1340,7 @@
   {
    "name": "room_panel_button_3",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1492,7 +1378,7 @@
   {
    "name": "room_panel_button_4",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1530,7 +1416,7 @@
   {
    "name": "room_panel_epaper",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [
@@ -1568,7 +1454,7 @@
   {
    "name": "room_panel_knob",
    "group": "devices",
-   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls",
    "wall": "south",
    "file": "devices/ (from your device repo)",
    "size_mm": [

@@ -1,0 +1,22 @@
+# Room Panel without the 2.9" e-paper display.
+#
+# Build the panel without J3 / the Waveshare module and include this file from the
+# room's yaml (see living-room-panel.yaml). Everything else keeps working: radar,
+# temperature, humidity, light, CO2 (if fitted), knob and buttons.
+
+display:
+  - id: !remove epaper
+
+font:                       # no fonts to download either
+  - id: !remove font_big
+  - id: !remove font_med
+  - id: !remove font_small
+
+sensor:
+  # The panel's scripts refresh the screen with "component.update: epaper".
+  # This hidden placeholder takes the name, so they validate and simply do nothing.
+  - platform: template
+    id: epaper
+    internal: true
+    update_interval: never
+    lambda: return {};

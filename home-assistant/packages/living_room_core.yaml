@@ -3,12 +3,12 @@
 #  Helpers, combined presence, open-window detection, day/night mode
 #  and the four scripts the Room Panel buttons call.
 #
-#  Entity ids used here (rename yours to match, or search/replace):
-#    binary_sensor.living_room_sensor_presence                     Room Sensor Lite
-#    binary_sensor.living_room_sensor_window_open_temperature_drop Room Sensor Lite
-#    sensor.living_room_sensor_illuminance                         Room Sensor Lite
-#    binary_sensor.living_room_panel_presence                      Room Panel
-#    sensor.living_room_panel_temperature                          Room Panel
+#  The Room Panel is the only sensor in the room. Entity ids used here
+#  (rename yours to match, or search/replace):
+#    binary_sensor.living_room_panel_presence                       Room Panel radar (C4002)
+#    sensor.living_room_panel_temperature                           Room Panel SHT40
+#    sensor.living_room_panel_illuminance                           Room Panel BH1750
+#    sensor.living_room_panel_co2                                   Room Panel SCD40 (optional)
 #    light.living_room_pendant, light.living_room_floor_lamp        IKEA KAJPLATS (Matter)
 #    cover.living_room_blinds                                       motorised blind
 #    climate.living_room_radiator                                   Better Thermostat on the LILJEBAGGE
@@ -91,8 +91,7 @@ light:
 
 sensor:
   # How fast the room temperature changes. A window opening in Danish winter shows up as a
-  # clear drop within a minute or two. Uses the panel's SHT40 (the sensor's own ESPHome
-  # "Window open" flag is used as well, see the template below).
+  # clear drop within a minute or two. The panel's SHT40 reads every 10 s for this.
   - platform: derivative
     name: Living room temperature change
     unique_id: living_room_temperature_change
@@ -103,24 +102,22 @@ sensor:
 
 template:
   - binary_sensor:
-      # One presence signal from both radars. While the robot vacuum is cleaning, the radars
-      # see the robot, so they are ignored; press any panel button to stop the robot.
+      # Presence from the panel's radar. While the robot vacuum is cleaning, the radar
+      # sees the robot, so it is ignored; press any panel button to stop the robot.
       - name: Living room occupied
         unique_id: living_room_occupied
         device_class: occupancy
         state: >
-          {% set radar = is_state('binary_sensor.living_room_sensor_presence', 'on')
-                      or is_state('binary_sensor.living_room_panel_presence', 'on') %}
-          {{ radar and not is_state('vacuum.robot_vacuum', 'cleaning') }}
+          {{ is_state('binary_sensor.living_room_panel_presence', 'on')
+             and not is_state('vacuum.robot_vacuum', 'cleaning') }}
         delay_off: "00:02:00"
 
-      # Open window from the temperature, no door/window contacts (as in the room-sensor repo)
+      # Open window from the temperature drop - no door/window contacts
       - name: Living room window open
         unique_id: living_room_window_open
         device_class: window
         state: >
-          {{ is_state('binary_sensor.living_room_sensor_window_open_temperature_drop', 'on')
-             or states('sensor.living_room_temperature_change') | float(0) < -0.3 }}
+          {{ states('sensor.living_room_temperature_change') | float(0) < -0.3 }}
         delay_off: "00:10:00"     # stays "open" until the room has stopped cooling for 10 min
 
       - name: Living room dark
@@ -128,7 +125,7 @@ template:
         device_class: light
         # "on" = dark. Only meaningful while the lights are off (they light up the sensor too)
         state: >
-          {{ states('sensor.living_room_sensor_illuminance') | float(0)
+          {{ states('sensor.living_room_panel_illuminance') | float(0)
              < states('input_number.living_room_dark_lux') | float(30)
              or is_state('sun.sun', 'below_horizon') }}
 
@@ -236,7 +233,7 @@ automation:
       - action: script.living_room_apply_blinds
       - action: script.living_room_apply_heating
 
-  # ---- air quality (Room Panel SCD40)
+  # ---- air quality (Room Panel SCD40 - never fires on a panel built without it)
   - id: living_room_co2_high
     alias: Living room - air out hint
     triggers:

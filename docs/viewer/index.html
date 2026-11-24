@@ -114,7 +114,7 @@ const wallObjs = Object.keys(WALLS).map(n => {
 
 const LABELS = { structure: "Walls, floor, door", window: "Window", blinds: "Blinds (motorised)",
   heating: "Radiator + smart TRV", lights: "Lights", vacuum: "Robot vacuum + dock",
-  devices: "Room Sensor + Room Panel", hub: "Home Assistant + Thread radio", furniture: "Furniture" };
+  devices: "Room Panel", hub: "Home Assistant + Thread radio", furniture: "Furniture" };
 const groupBox = document.getElementById("groups");
 const hidden = new Set((q.get("hide") || "").split(",").filter(Boolean));
 for (const g of Object.keys(LABELS).filter(g => groups[g])) {

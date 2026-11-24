@@ -13,13 +13,12 @@ Coordinates in this script (mm, Z up):
   z = 0..ROOM_H  floor -> ceiling  walls sit OUTSIDE this box.
 
 Part local coordinates (so each STL is easy to reuse):
-  wall-mounted things: back against the wall at z=0, facing +z (like the room-sensor case)
+  wall-mounted things: back against the wall at z=0, facing +z
   floor-standing things: standing on z=0, centred on x/y
 
-The two sensor devices are not modelled here: they are the real case STLs from
-  https://github.com/gustavwrisberg/room-sensor  (enclosure/)
-  https://github.com/gustavwrisberg/room-panel   (hardware/case/out/)
-copied into devices/ and placed in the room.
+The Room Panel (the room's only sensor/control device) is not modelled here: it is the
+real case from https://github.com/gustavwrisberg/room-panel (hardware/case/out/),
+copied into devices/ and placed next to the door.
 Everything else is a simple stand-in with the right size, not a copy of any product's design.
 """
 import json
@@ -45,7 +44,6 @@ DOOR_W, DOOR_H, DOOR_X = 900.0, 2100.0, 1050.0            # south wall, door cen
 
 RADIATOR_W, RADIATOR_H, RADIATOR_D, RADIATOR_Z = 1000.0, 600.0, 100.0, 150.0
 PANEL_Z = 1400.0              # room panel centre height (by the door, light-switch height)
-SENSOR_Z = 2150.0             # room sensor in the north-east corner, corner mount
 
 # ------------------------------------------------------------------ helpers
 def box(x0, y0, z0, x1, y1, z1):
@@ -95,9 +93,6 @@ def on_north_wall(x, z):   # wall at y = ROOM_D, facing south
 
 def on_south_wall(x, z):   # wall at y = 0, facing north
     return frame([x, 0, z], [0, 1, 0])
-
-def in_corner_ne(z):       # north-east corner, facing south-west
-    return frame([ROOM_W, ROOM_D, z], [-1, -1, 0])
 
 # ------------------------------------------------------------------ PARTS
 # Each builder returns a manifold in local coordinates.
@@ -304,21 +299,9 @@ def plant():
     leaves = M.sphere(220).scale([1, 1, 1.3]).translate([0, 0, 900])
     return pot + soil + stem + leaves
 
-# ------------------------------------------------------------------ device assemblies from your other repos
+# ------------------------------------------------------------------ Room Panel from its own repo
 def load_stl(path):
     return trimesh.load(path, force="mesh")
-
-def room_sensor_assembly():
-    """Room Sensor Lite on its 45-degree corner mount. local: corner apex at z=-32 behind,
-    sensor facing +z, x/y centred"""
-    d = DEVICES / "room-sensor-lite"
-    base, lid, corner = (load_stl(d / f) for f in ("lite_base.stl", "lite_lid.stl", "lite_corner_mount.stl"))
-    off = move(32 - 76.2 / 2, (45 - 28.7) / 2, 0)            # sensor centred on the wedge face
-    centre = move(-32, -22.5, 32)                            # apex of the wedge -> origin
-    for g in (base, lid):
-        g.apply_transform(chain(centre, off))
-    corner.apply_transform(centre)
-    return {"room_sensor_base": base, "room_sensor_lid": lid, "room_sensor_corner_mount": corner}
 
 def room_panel_assembly():
     """Room Panel case, as printed: front face on z=0 facing -z. Turned so the front faces +z and
@@ -354,7 +337,7 @@ COL = {
     "bulb": (255, 236, 180, 255), "vacuum": (35, 37, 40, 255), "dock": (60, 62, 66, 255),
     "sofa": (90, 110, 130, 255), "wood": (160, 120, 80, 255), "rug": (180, 175, 160, 255),
     "tv": (20, 20, 22, 255), "hub": (235, 235, 235, 255), "radio": (245, 245, 245, 255),
-    "sensor": (250, 250, 248, 255), "panel": (225, 225, 220, 255), "panel_back": (150, 150, 150, 255),
+    "panel": (225, 225, 220, 255), "panel_back": (150, 150, 150, 255),
     "door": (245, 245, 240, 255), "plant": (70, 130, 80, 255), "pot": (190, 110, 80, 255),
     "white": (250, 250, 250, 255), "epaper": (205, 207, 198, 255),
 }
@@ -434,16 +417,12 @@ def layout():
     add("thread_radio", thread_radio(), "radio", move(ROOM_W - 120, 2520, 450), "hub",
         "Home Assistant Connect ZBT-2 (Thread) on a USB extension")
 
-    # your devices (real case STLs)
-    for name, g in room_sensor_assembly().items():
-        col = "sensor" if "corner" not in name else "white"
-        L[name] = (g, col, in_corner_ne(SENSOR_Z), "devices",
-                   "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner")
+    # the Room Panel (real case STLs)
     panel_x = DOOR_X + DOOR_W / 2 + 200
     for name, g in room_panel_assembly().items():
         col = "panel_back" if "back" in name else "epaper" if "epaper" in name else "panel"
         L[name] = (g, col, on_south_wall(panel_x, PANEL_Z), "devices",
-                   "Room Panel (github.com/gustavwrisberg/room-panel), next to the door")
+                   "Room Panel (github.com/gustavwrisberg/room-panel), next to the door: radar, climate, light, CO2, controls")
     return L
 
 # parts fixed to a wall: the viewer hides them together with that wall

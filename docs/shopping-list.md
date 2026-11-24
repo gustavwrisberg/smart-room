@@ -14,9 +14,7 @@ VAT) and change often; the same list is in [`hardware/shopping-list.csv`](../har
 
 | Item | Used here | Qty | ~€ | Connects | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Corner sensor | [Room Sensor Lite](https://github.com/gustavwrisberg/room-sensor) | 1 | 20 | Wi-Fi, ESPHome | LD2410C radar, SHT40, BH1750. Board ≈ $22 at 5 pcs from JLCPCB + case. Use the corner mount |
-| Wall panel | [Room Panel](https://github.com/gustavwrisberg/room-panel) | 1 | 67 | Wi-Fi, ESPHome | C4002 radar, SHT40, BH1750, SCD40, 2.9" e-paper, knob, 4 buttons. ≈ $78 incl. modules |
-| USB charger + cable | Any 5 V 1 A | 1 | 6 | – | For the corner sensor; the panel's is in its BOM |
+| Room device | [Room Panel](https://github.com/gustavwrisberg/room-panel), full build | 1 | 67 | Wi-Fi, ESPHome | The only sensor in the room: C4002 radar, SHT40, BH1750, SCD40, 2.9" e-paper, knob, 4 buttons. ≈ $78 incl. USB charger. Cheaper builds below |
 | Smart bulbs | IKEA KAJPLATS E27, colour and white spectrum | 2 | 12 | Matter over Thread | Mains-powered, so they also extend the Thread mesh |
 | Lamps | Ceiling pendant + floor lamp (E27) | 2 | – | – | Any you like |
 | Radiator thermostat | IKEA LILJEBAGGE | 1 | 15 | Matter over Thread | M30 × 1.5; check the adapter for your valve (Danfoss RA etc.) |
@@ -24,8 +22,26 @@ VAT) and change often; the same list is in [`hardware/shopping-list.csv`](../har
 | Blind motor | Motor board on the Room Panel's J2 header (separate design) **or** a Matter/Thread blind motor | 1 | – | ESPHome / Matter | Anything that shows up as `cover.living_room_blinds` |
 | Robot vacuum | Roborock with LiDAR room maps | 1 | 500 | Wi-Fi | Core integration, supports `vacuum.clean_area` |
 
-**Total:** about **€830** with the hub and vacuum; **≈ €220** for the room alone if you already
+**Total:** about **€805** with the hub and vacuum; **≈ €150** for the room alone if you already
 have Home Assistant, a Thread radio and a vacuum.
+
+## Room Panel: build only what the room needs
+
+One Room Panel per room does everything. The same PCB and case work with fewer parts:
+leave a module off and the rest keeps working.
+
+| Build | Leave out | What you lose | ~€ per panel | Firmware |
+| --- | --- | --- | --- | --- |
+| **Full** (this example) | – | – | 67 | `esphome/living-room-panel.yaml` as is |
+| **No screen** | Waveshare 2.9" e-paper, its cable and J3 | The status/control display. Knob and buttons still work | 49 | Uncomment `no_screen` in the yaml |
+| **No CO₂** | SCD40/SCD41 breakout and its wires on J4 | CO₂ reading and the "air out" hint | 49 | Nothing to change; CO₂ shows as unavailable |
+| **Presence + climate only** | Both of the above | Both of the above | 32 | Uncomment `no_screen` |
+
+Every build keeps what the automations need: radar presence, temperature (heating, window
+detection), light level (lights), and the knob and buttons. A bedroom or hallway usually
+does fine with the cheapest build; keep CO₂ in rooms where people sit for hours.
+
+Prices from the room-panel BOM (Nov 2026: display ≈ $21, CO₂ breakout ≈ $20).
 
 ## Optional, whole home
 

@@ -1,0 +1,147 @@
+# =====================================================================
+#  Living room - lights
+#  Presence + darkness turns the lights on, the scene decides how.
+#  Day: neutral white. Evening: warm. Night mode: a dim night light only.
+#  Lights: two IKEA KAJPLATS bulbs (Matter over Thread) -> light.living_room
+# =====================================================================
+
+script:
+  living_room_apply_lights:
+    alias: Living room - apply lights
+    mode: restart
+    fields:
+      force:
+        description: Turn on even if the room is bright (used by the scene button)
+        example: true
+    sequence:
+      - variables:
+          scene: "{{ states('input_select.living_room_scene') }}"
+          evening: "{{ is_state('sun.sun', 'below_horizon') }}"
+          kelvin: "{{ 2700 if evening else 4000 }}"
+          # [pendant %, floor lamp %, kelvin]; 0 = off
+          looks:
+            Everyday: [80, 70]
+            Cozy: [0, 50]
+            Movie: [0, 12]
+            Bright: [100, 100]
+          look: "{{ looks.get(scene, [80, 70]) }}"
+      - choose:
+          # nobody here -> off
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.living_room_occupied
+                state: "off"
+            sequence:
+              - action: light.turn_off
+                target:
+                  entity_id: light.living_room
+                data:
+                  transition: 5
+
+          # night mode -> floor lamp as a dim warm night light
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.night_mode
+                state: "on"
+            sequence:
+              - action: light.turn_off
+                target:
+                  entity_id: light.living_room_pendant
+              - action: light.turn_on
+                target:
+                  entity_id: light.living_room_floor_lamp
+                data:
+                  brightness_pct: 5
+                  color_temp_kelvin: 2200
+
+          # dark enough (or the scene button was pressed) -> the scene
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ force | default(false) or is_state('binary_sensor.living_room_dark', 'on')
+                     or is_state('light.living_room', 'on') }}
+            sequence:
+              - repeat:
+                  for_each:
+                    - entity: light.living_room_pendant
+                      pct: "{{ look[0] }}"
+                    - entity: light.living_room_floor_lamp
+                      pct: "{{ look[1] }}"
+                  sequence:
+                    - if:
+                        - condition: template
+                          value_template: "{{ repeat.item.pct | int == 0 }}"
+                      then:
+                        - action: light.turn_off
+                          target:
+                            entity_id: "{{ repeat.item.entity }}"
+                      else:
+                        - action: light.turn_on
+                          target:
+                            entity_id: "{{ repeat.item.entity }}"
+                          data:
+                            brightness_pct: "{{ repeat.item.pct | int }}"
+                            color_temp_kelvin: "{{ (2200 if scene in ['Cozy', 'Movie'] else kelvin) | int }}"
+                            transition: 1
+
+automation:
+  - id: living_room_lights_on_presence
+    alias: Living room lights - someone comes in
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.living_room_occupied
+        to: "on"
+      - trigger: state
+        entity_id: binary_sensor.living_room_dark
+        to: "on"
+        for: "00:03:00"
+    conditions:
+      - condition: state
+        entity_id: input_boolean.living_room_auto
+        state: "on"
+      - condition: state
+        entity_id: binary_sensor.living_room_occupied
+        state: "on"
+      - condition: state
+        entity_id: timer.living_room_lights_hold
+        state: idle
+      - condition: state
+        entity_id: light.living_room
+        state: "off"
+    actions:
+      - action: script.living_room_apply_lights
+
+  - id: living_room_lights_off_empty
+    alias: Living room lights - off when empty
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.living_room_occupied
+        to: "off"
+        for: "00:05:00"
+    conditions:
+      - condition: state
+        entity_id: input_boolean.living_room_auto
+        state: "on"
+    actions:
+      - action: light.turn_off
+        target:
+          entity_id: light.living_room
+        data:
+          transition: 5
+
+  - id: living_room_lights_follow_sun
+    alias: Living room lights - warm up at sunset
+    triggers:
+      - trigger: sun
+        event: sunset
+      - trigger: sun
+        event: sunrise
+    conditions:
+      - condition: state
+        entity_id: light.living_room
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.living_room_auto
+        state: "on"
+    actions:
+      - action: script.living_room_apply_lights

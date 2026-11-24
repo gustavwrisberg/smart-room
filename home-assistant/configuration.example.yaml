@@ -1,0 +1,4 @@
+# Add these lines to your Home Assistant configuration.yaml, then copy the
+# packages/ folder next to it (/config/packages/ on Home Assistant OS / Green).
+homeassistant:
+  packages: !include_dir_named packages

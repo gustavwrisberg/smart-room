@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Room – 3D viewer</title>
+<style>
+  :root { --bg:#f4f3ef; --ink:#1d1f22; --muted:#6b6f75; --line:#dddad2; --accent:#2f6f9f; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font:14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { position:fixed; inset:0; }
+  aside { position:fixed; top:12px; left:12px; width:280px; max-height:calc(100% - 24px); overflow:auto;
+    background:rgba(255,255,255,.92); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  h1 { font-size:16px; margin:0 0 2px; }
+  p.sub { margin:0 0 12px; color:var(--muted); font-size:12px; }
+  h2 { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
+  label { display:flex; gap:8px; align-items:center; padding:2px 0; cursor:pointer; }
+  #info { position:fixed; right:12px; bottom:12px; max-width:340px; background:rgba(255,255,255,.95);
+    border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:none; }
+  #info b { display:block; margin-bottom:2px; }
+  #info a { color:var(--accent); }
+  .hint { color:var(--muted); font-size:12px; margin-top:12px; }
+  body.shot aside, body.shot #info { display:none !important; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+<aside>
+  <h1>Smart Room</h1>
+  <p class="sub">Every part is its own model in <code>models/parts/</code>. Click a part for details.</p>
+  <h2>Show</h2>
+  <div id="groups"></div>
+  <label><input type="checkbox" id="cutaway" checked> Hide walls facing the camera</label>
+  <p class="hint">Drag to orbit · scroll to zoom · right-drag to pan</p>
+</aside>
+<div id="info"></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const q = new URLSearchParams(location.search);
+if (q.get("shot")) document.body.classList.add("shot");
+const MODEL = q.get("model") || "../../models/room.glb";
+const LAYOUT = q.get("layout") || "../../models/room_layout.json";
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.getElementById("app").appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf4f3ef);
+const camera = new THREE.PerspectiveCamera(+(q.get("fov") || 40), 1, 0.05, 100);
+const v = (s, d) => (s || d).split(",").map(Number);
+camera.position.set(...v(q.get("c"), "6.6,4.6,2.6"));
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(...v(q.get("t"), "2.25,0.8,-1.8"));
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xd8cfc0, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+sun.position.set(6, 9, 4);
+sun.target.position.set(2.25, 0, -1.8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 });
+sun.shadow.bias = -0.0005;
+scene.add(sun, sun.target);
+const lampGlow = new THREE.PointLight(0xffe2a8, 1.2, 4);
+lampGlow.position.set(2.25, 1.85, -1.8);
+scene.add(lampGlow);
+
+const info = document.getElementById("info");
+let layout = { parts: [] };
+try { layout = await (await fetch(LAYOUT)).json(); } catch (e) {}
+const byName = Object.fromEntries(layout.parts.map(p => [p.name, p]));
+
+// wall normals in three.js coordinates (room y -> -z)
+const WALLS = { wall_north: [0, 0, 1], wall_south: [0, 0, -1], wall_west: [1, 0, 0], wall_east: [-1, 0, 0] };
+const groups = {};
+const pickables = [];
+const gltf = await new GLTFLoader().loadAsync(MODEL);
+const room = gltf.scene;
+room.traverse(o => {
+  if (!o.isMesh) return;
+  o.castShadow = o.receiveShadow = true;
+  const name = o.name in byName ? o.name : o.parent?.name;
+  o.userData.part = name;
+  const g = byName[name]?.group || "other";
+  (groups[g] ||= []).push(o);
+  pickables.push(o);
+});
+scene.add(room);
+room.updateMatrixWorld(true);
+const wallObjs = Object.keys(WALLS).map(n => {
+  const o = room.getObjectByName(n);
+  if (!o) return null;
+  const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
+  const side = n.replace("wall_", "");
+  const fixed = layout.parts.filter(p => p.wall === side).map(p => room.getObjectByName(p.name)).filter(Boolean);
+  return { o, c, n: new THREE.Vector3(...WALLS[n]), fixed };
+}).filter(Boolean);
+
+const LABELS = { structure: "Walls, floor, door", window: "Window", blinds: "Blinds (motorised)",
+  heating: "Radiator + smart TRV", lights: "Lights", vacuum: "Robot vacuum + dock",
+  devices: "Room Sensor + Room Panel", hub: "Home Assistant + Thread radio", furniture: "Furniture" };
+const groupBox = document.getElementById("groups");
+const hidden = new Set((q.get("hide") || "").split(",").filter(Boolean));
+for (const g of Object.keys(LABELS).filter(g => groups[g])) {
+  const l = document.createElement("label");
+  l.innerHTML = `<input type="checkbox" ${hidden.has(g) ? "" : "checked"}> ${LABELS[g]}`;
+  const cb = l.querySelector("input");
+  const apply = () => groups[g].forEach(o => o.userData.groupOff = !cb.checked);
+  cb.onchange = apply; apply();
+  groupBox.appendChild(l);
+}
+const cut = document.getElementById("cutaway");
+
+function updateVisibility() {
+  for (const list of Object.values(groups)) for (const o of list) o.visible = !o.userData.groupOff;
+  if (cut.checked) for (const w of wallObjs) {
+    const toCam = camera.position.clone().sub(w.c);
+    if (toCam.dot(w.n) < 0) for (const obj of [w.o, ...w.fixed]) obj.traverse(m => { if (m.isMesh) m.visible = false; });
+  }
+}
+
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+let picked = null;
+renderer.domElement.addEventListener("click", e => {
+  mouse.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(mouse, camera);
+  const hit = ray.intersectObjects(pickables.filter(o => o.visible))[0];
+  if (picked) picked.material.emissive?.setHex(0x000000);
+  if (!hit) { info.style.display = "none"; picked = null; return; }
+  picked = hit.object;
+  picked.material = picked.material.clone();
+  picked.material.emissive?.setHex(0x223344);
+  const p = byName[picked.userData.part] || { name: picked.userData.part };
+  const file = p.file?.startsWith("parts/")
+    ? `<a href="../../models/${p.file}" download>Download STL</a> · <a href="../../models/${p.file.replace('.stl', '.glb')}" download>GLB</a>`
+    : `<span>Case STL from the device repo (see README)</span>`;
+  info.innerHTML = `<b>${p.name}</b>${p.description || ""}<br>${p.size_mm ? p.size_mm.join(" × ") + " mm<br>" : ""}${file}`;
+  info.style.display = "block";
+});
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize); resize();
+renderer.setAnimationLoop(() => { controls.update(); updateVisibility(); renderer.render(scene, camera); });
+window.__ready = true;
+</script>
+</body>
+</html>

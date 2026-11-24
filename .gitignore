@@ -1,0 +1,11 @@
+# ESPHome
+secrets.yaml
+.esphome/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node (only needed for the render script)
+node_modules/

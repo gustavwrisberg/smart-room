@@ -1,0 +1,1607 @@
+{
+ "units": "mm",
+ "up": "z",
+ "room": {
+  "width_x": 4500.0,
+  "depth_y": 3600.0,
+  "height_z": 2500.0
+ },
+ "parts": [
+  {
+   "name": "floor",
+   "group": "structure",
+   "description": "Floor slab, wood colour",
+   "wall": null,
+   "file": "parts/floor.stl",
+   "size_mm": [
+    4700.0,
+    3800.0,
+    20.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "wall_north",
+   "group": "structure",
+   "description": "North wall with window opening",
+   "wall": null,
+   "file": "parts/wall_north.stl",
+   "size_mm": [
+    4700.0,
+    2500.0,
+    100.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     -100.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3600.0
+    ],
+    [
+     -0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "wall_south",
+   "group": "structure",
+   "description": "South wall with door opening",
+   "wall": null,
+   "file": "parts/wall_south.stl",
+   "size_mm": [
+    4700.0,
+    2500.0,
+    100.0
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     4600.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "wall_west",
+   "group": "structure",
+   "description": "West wall",
+   "wall": null,
+   "file": "parts/wall_west.stl",
+   "size_mm": [
+    3600.0,
+    2500.0,
+    100.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "wall_east",
+   "group": "structure",
+   "description": "East wall",
+   "wall": null,
+   "file": "parts/wall_east.stl",
+   "size_mm": [
+    3600.0,
+    2500.0,
+    100.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     0.0,
+     -1.0,
+     4500.0
+    ],
+    [
+     -1.0,
+     0.0,
+     0.0,
+     3600.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "door",
+   "group": "structure",
+   "description": "Door leaf with handle",
+   "wall": "south",
+   "file": "parts/door.stl",
+   "size_mm": [
+    890.0,
+    2090.0,
+    110.0
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1495.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     -20.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "window_frame",
+   "group": "window",
+   "description": "Window frame and inside window board",
+   "wall": "north",
+   "file": "parts/window_frame.stl",
+   "size_mm": [
+    1260.0,
+    1320.0,
+    230.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3615.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     850.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "window_sash",
+   "group": "window",
+   "description": "Opening sash (inward-opening, tilt/turn)",
+   "wall": "north",
+   "file": "parts/window_sash.stl",
+   "size_mm": [
+    1110.0,
+    1210.0,
+    56.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3620.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     895.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "window_glass",
+   "group": "window",
+   "description": "Double glazing",
+   "wall": "north",
+   "file": "parts/window_glass.stl",
+   "size_mm": [
+    1010.0,
+    1110.0,
+    24.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3620.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     940.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "window_handle",
+   "group": "window",
+   "description": "Window handle",
+   "wall": "north",
+   "file": "parts/window_handle.stl",
+   "size_mm": [
+    30.0,
+    155.0,
+    26.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2740.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3620.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1450.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "blind_headrail",
+   "group": "blinds",
+   "description": "Cellular blind headrail (IKEA HOPPVALS) with the motor housing on the right",
+   "wall": "north",
+   "file": "parts/blind_headrail.stl",
+   "size_mm": [
+    1300.0,
+    65.0,
+    55.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3600.0
+    ],
+    [
+     -0.0,
+     1.0,
+     0.0,
+     2270.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "blind_fabric",
+   "group": "blinds",
+   "description": "Cellular (honeycomb) blind fabric, shown 650 mm down",
+   "wall": "north",
+   "file": "parts/blind_fabric.stl",
+   "size_mm": [
+    1260.0,
+    650.0,
+    18.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3600.0
+    ],
+    [
+     -0.0,
+     1.0,
+     0.0,
+     2270.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "blind_bottom_rail",
+   "group": "blinds",
+   "description": "Bottom rail of the blind",
+   "wall": "north",
+   "file": "parts/blind_bottom_rail.stl",
+   "size_mm": [
+    1260.0,
+    25.0,
+    26.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3600.0
+    ],
+    [
+     -0.0,
+     1.0,
+     0.0,
+     1575.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "radiator",
+   "group": "heating",
+   "description": "Type-22 panel radiator, 1000 x 600 mm",
+   "wall": "north",
+   "file": "parts/radiator.stl",
+   "size_mm": [
+    1000.0,
+    600.0,
+    100.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3560.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     150.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "radiator_valve",
+   "group": "heating",
+   "description": "Valve body with M30 x 1.5 thread",
+   "wall": "north",
+   "file": "parts/radiator_valve.stl",
+   "size_mm": [
+    72.0,
+    30.0,
+    155.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2750.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3500.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     230.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "trv",
+   "group": "heating",
+   "description": "Smart radiator thermostat stand-in (IKEA LILJEBAGGE, Matter over Thread)",
+   "wall": "north",
+   "file": "parts/trv.stl",
+   "size_mm": [
+    101.0,
+    54.0,
+    54.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2822.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     3500.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     230.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "pendant_lamp",
+   "group": "lights",
+   "description": "Ceiling pendant",
+   "wall": null,
+   "file": "parts/pendant_lamp.stl",
+   "size_mm": [
+    400.0,
+    400.0,
+    760.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     2500.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "bulb_pendant",
+   "group": "lights",
+   "description": "Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread)",
+   "wall": null,
+   "file": "parts/bulb_pendant.stl",
+   "size_mm": [
+    95.0,
+    95.0,
+    132.5
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2250.0
+    ],
+    [
+     0.0,
+     -1.0,
+     -0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     -1.0,
+     1900.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "floor_lamp",
+   "group": "lights",
+   "description": "Floor lamp next to the sofa",
+   "wall": null,
+   "file": "parts/floor_lamp.stl",
+   "size_mm": [
+    380.0,
+    380.0,
+    1650.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     450.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     3200.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "bulb_floor_lamp",
+   "group": "lights",
+   "description": "Second smart bulb",
+   "wall": null,
+   "file": "parts/bulb_floor_lamp.stl",
+   "size_mm": [
+    95.0,
+    95.0,
+    132.5
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     450.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     3200.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     1430.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "vacuum_dock",
+   "group": "vacuum",
+   "description": "Self-empty dock against the south wall",
+   "wall": null,
+   "file": "parts/vacuum_dock.stl",
+   "size_mm": [
+    340.0,
+    300.0,
+    420.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     3700.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "robot_vacuum",
+   "group": "vacuum",
+   "description": "Robot vacuum stand-in (Roborock with the core integration)",
+   "wall": null,
+   "file": "parts/robot_vacuum.stl",
+   "size_mm": [
+    352.0,
+    351.0,
+    105.0
+   ],
+   "transform_mm": [
+    [
+     0.8192,
+     -0.5736,
+     0.0,
+     3150.0
+    ],
+    [
+     0.5736,
+     0.8192,
+     0.0,
+     1150.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "rug",
+   "group": "furniture",
+   "description": "Rug",
+   "wall": null,
+   "file": "parts/rug.stl",
+   "size_mm": [
+    2400.0,
+    1700.0,
+    10.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     2050.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "sofa",
+   "group": "furniture",
+   "description": "Three-seat sofa",
+   "wall": null,
+   "file": "parts/sofa.stl",
+   "size_mm": [
+    2200.0,
+    900.0,
+    820.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     1.0,
+     0.0,
+     600.0
+    ],
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1750.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "coffee_table",
+   "group": "furniture",
+   "description": "Coffee table",
+   "wall": null,
+   "file": "parts/coffee_table.stl",
+   "size_mm": [
+    1100.0,
+    600.0,
+    450.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     1900.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     10.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "tv_bench",
+   "group": "furniture",
+   "description": "TV bench",
+   "wall": null,
+   "file": "parts/tv_bench.stl",
+   "size_mm": [
+    1600.0,
+    400.0,
+    450.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     -1.0,
+     0.0,
+     4300.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "tv",
+   "group": "furniture",
+   "description": "TV",
+   "wall": null,
+   "file": "parts/tv.stl",
+   "size_mm": [
+    1240.0,
+    200.0,
+    870.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     -1.0,
+     0.0,
+     4300.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.0,
+     1800.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "bookshelf",
+   "group": "furniture",
+   "description": "Bookshelf",
+   "wall": null,
+   "file": "parts/bookshelf.stl",
+   "size_mm": [
+    800.0,
+    300.0,
+    1800.0
+   ],
+   "transform_mm": [
+    [
+     0.0,
+     -1.0,
+     0.0,
+     4350.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.0,
+     3050.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "plant",
+   "group": "furniture",
+   "description": "Plant by the window",
+   "wall": null,
+   "file": "parts/plant.stl",
+   "size_mm": [
+    440.0,
+    440.0,
+    1186.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     1350.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     3300.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "ha_hub",
+   "group": "hub",
+   "description": "Home Assistant Green / mini PC",
+   "wall": null,
+   "file": "parts/ha_hub.stl",
+   "size_mm": [
+    112.0,
+    112.0,
+    32.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     4170.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2520.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     450.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "thread_radio",
+   "group": "hub",
+   "description": "Home Assistant Connect ZBT-2 (Thread) on a USB extension",
+   "wall": null,
+   "file": "parts/thread_radio.stl",
+   "size_mm": [
+    28.0,
+    305.0,
+    14.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     4380.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2520.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     450.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_sensor_base",
+   "group": "devices",
+   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
+   "wall": null,
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    76.2,
+    28.7,
+    14.6
+   ],
+   "transform_mm": [
+    [
+     0.7071,
+     0.0,
+     -0.7071,
+     4500.0
+    ],
+    [
+     -0.7071,
+     0.0,
+     -0.7071,
+     3600.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2150.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_sensor_lid",
+   "group": "devices",
+   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
+   "wall": null,
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    76.2,
+    28.7,
+    9.5
+   ],
+   "transform_mm": [
+    [
+     0.7071,
+     0.0,
+     -0.7071,
+     4500.0
+    ],
+    [
+     -0.7071,
+     0.0,
+     -0.7071,
+     3600.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2150.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_sensor_corner_mount",
+   "group": "devices",
+   "description": "Room Sensor Lite (github.com/gustavwrisberg/room-sensor), north-east corner",
+   "wall": null,
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    64.0,
+    45.0,
+    36.9
+   ],
+   "transform_mm": [
+    [
+     0.7071,
+     0.0,
+     -0.7071,
+     4500.0
+    ],
+    [
+     -0.7071,
+     0.0,
+     -0.7071,
+     3600.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2150.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_front_shell",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    145.0,
+    70.0,
+    21.0
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_back_plate",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    145.0,
+    70.0,
+    12.4
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_button_1",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    10.5,
+    10.5,
+    9.8
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_button_2",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    10.5,
+    10.5,
+    9.8
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_button_3",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    10.5,
+    10.5,
+    9.8
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_button_4",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    10.5,
+    10.5,
+    9.8
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_epaper",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    89.5,
+    38.0,
+    1.2
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "room_panel_knob",
+   "group": "devices",
+   "description": "Room Panel (github.com/gustavwrisberg/room-panel), next to the door",
+   "wall": "south",
+   "file": "devices/ (from your device repo)",
+   "size_mm": [
+    13.0,
+    13.0,
+    11.0
+   ],
+   "transform_mm": [
+    [
+     -1.0,
+     0.0,
+     0.0,
+     1700.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     1400.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  }
+ ]
+}

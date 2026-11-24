@@ -1,0 +1,56 @@
+# =====================================================================
+#  Living room - heating
+#  IKEA LILJEBAGGE radiator thermostat (Matter over Thread), wrapped by
+#  Better Thermostat (HACS) so it regulates on the Room Panel's temperature
+#  instead of the reading at the valve.
+#
+#  Target (sensor.living_room_heating_target, see living_room_core.yaml):
+#    night mode                      -> night temperature   (18 °C)
+#    occupied, or within 30 min      -> comfort temperature (21 °C)
+#    empty for 30 min                -> eco temperature     (19 °C)
+#    window open (temperature drop)  -> radiator off until the room stops cooling
+#
+#  In Better Thermostat leave "window sensor" empty - this package handles windows.
+# =====================================================================
+
+script:
+  living_room_apply_heating:
+    alias: Living room - apply heating
+    mode: restart
+    sequence:
+      - if:
+          - condition: state
+            entity_id: binary_sensor.living_room_window_open
+            state: "on"
+        then:
+          - action: climate.set_hvac_mode
+            target:
+              entity_id: climate.living_room_radiator
+            data:
+              hvac_mode: "off"
+        else:
+          - action: climate.set_temperature
+            target:
+              entity_id: climate.living_room_radiator
+            data:
+              hvac_mode: heat
+              temperature: "{{ states('sensor.living_room_heating_target') | float(19) }}"
+
+automation:
+  - id: living_room_heating_follow_target
+    alias: Living room heating - follow presence, night and window
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: sensor.living_room_heating_target
+      - trigger: state
+        entity_id: binary_sensor.living_room_window_open
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: state
+        entity_id: input_boolean.living_room_auto
+        state: "on"
+    actions:
+      - delay: "00:00:05"        # let presence settle before sending a Thread command
+      - action: script.living_room_apply_heating

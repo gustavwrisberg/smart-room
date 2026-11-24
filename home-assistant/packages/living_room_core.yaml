@@ -1,0 +1,258 @@
+# =====================================================================
+#  Living room - core
+#  Helpers, combined presence, open-window detection, day/night mode
+#  and the four scripts the Room Panel buttons call.
+#
+#  Entity ids used here (rename yours to match, or search/replace):
+#    binary_sensor.living_room_sensor_presence                     Room Sensor Lite
+#    binary_sensor.living_room_sensor_window_open_temperature_drop Room Sensor Lite
+#    sensor.living_room_sensor_illuminance                         Room Sensor Lite
+#    binary_sensor.living_room_panel_presence                      Room Panel
+#    sensor.living_room_panel_temperature                          Room Panel
+#    light.living_room_pendant, light.living_room_floor_lamp        IKEA KAJPLATS (Matter)
+#    cover.living_room_blinds                                       motorised blind
+#    climate.living_room_radiator                                   Better Thermostat on the LILJEBAGGE
+#    vacuum.robot_vacuum                                            Roborock
+# =====================================================================
+
+input_boolean:
+  living_room_auto:
+    name: Living room automatic
+    icon: mdi:home-automation
+  night_mode:
+    name: Night mode
+    icon: mdi:weather-night
+
+input_datetime:
+  night_starts:
+    name: Night starts
+    has_date: false
+    has_time: true
+    initial: "23:00"
+  morning_starts:
+    name: Morning starts
+    has_date: false
+    has_time: true
+    initial: "07:00"
+
+input_number:
+  living_room_comfort_temp:
+    name: Living room comfort temperature
+    min: 15
+    max: 25
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 21
+  living_room_eco_temp:
+    name: Living room eco temperature (empty)
+    min: 12
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 19
+  living_room_night_temp:
+    name: Living room night temperature
+    min: 12
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 18
+  living_room_dark_lux:
+    name: Living room dark below
+    min: 5
+    max: 200
+    step: 5
+    unit_of_measurement: lx
+    initial: 30
+
+input_select:
+  living_room_scene:
+    name: Living room scene
+    icon: mdi:palette
+    options:
+      - Everyday
+      - Cozy
+      - Movie
+      - Bright
+
+timer:
+  living_room_lights_hold:
+    name: Living room lights hold
+    duration: "00:02:00"     # after "all off", ignore presence long enough to walk out
+
+# The two KAJPLATS bulbs as one light: this is light.living_room, the panel's light_entity
+light:
+  - platform: group
+    name: Living room
+    unique_id: living_room_light_group
+    entities:
+      - light.living_room_pendant
+      - light.living_room_floor_lamp
+
+sensor:
+  # How fast the room temperature changes. A window opening in Danish winter shows up as a
+  # clear drop within a minute or two. Uses the panel's SHT40 (the sensor's own ESPHome
+  # "Window open" flag is used as well, see the template below).
+  - platform: derivative
+    name: Living room temperature change
+    unique_id: living_room_temperature_change
+    source: sensor.living_room_panel_temperature
+    round: 2
+    unit_time: min
+    time_window: "00:02:00"
+
+template:
+  - binary_sensor:
+      # One presence signal from both radars. While the robot vacuum is cleaning, the radars
+      # see the robot, so they are ignored; press any panel button to stop the robot.
+      - name: Living room occupied
+        unique_id: living_room_occupied
+        device_class: occupancy
+        state: >
+          {% set radar = is_state('binary_sensor.living_room_sensor_presence', 'on')
+                      or is_state('binary_sensor.living_room_panel_presence', 'on') %}
+          {{ radar and not is_state('vacuum.robot_vacuum', 'cleaning') }}
+        delay_off: "00:02:00"
+
+      # Open window from the temperature, no door/window contacts (as in the room-sensor repo)
+      - name: Living room window open
+        unique_id: living_room_window_open
+        device_class: window
+        state: >
+          {{ is_state('binary_sensor.living_room_sensor_window_open_temperature_drop', 'on')
+             or states('sensor.living_room_temperature_change') | float(0) < -0.3 }}
+        delay_off: "00:10:00"     # stays "open" until the room has stopped cooling for 10 min
+
+      - name: Living room dark
+        unique_id: living_room_dark
+        device_class: light
+        # "on" = dark. Only meaningful while the lights are off (they light up the sensor too)
+        state: >
+          {{ states('sensor.living_room_sensor_illuminance') | float(0)
+             < states('input_number.living_room_dark_lux') | float(30)
+             or is_state('sun.sun', 'below_horizon') }}
+
+  - sensor:
+      # Heating target from presence and day/night, applied in living_room_heating.yaml
+      - name: Living room heating target
+        unique_id: living_room_heating_target
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >
+          {% set occ = states.binary_sensor.living_room_occupied %}
+          {% if is_state('input_boolean.night_mode', 'on') %}
+            {{ states('input_number.living_room_night_temp') | float(18) }}
+          {% elif occ is not none and (occ.state == 'on'
+                   or now() - occ.last_changed < timedelta(minutes=30)) %}
+            {{ states('input_number.living_room_comfort_temp') | float(21) }}
+          {% else %}
+            {{ states('input_number.living_room_eco_temp') | float(19) }}
+          {% endif %}
+
+script:
+  # ---- the four scripts the Room Panel buttons call (see esphome/living-room-panel.yaml)
+  living_room_all_off:
+    alias: Living room - all off
+    icon: mdi:power
+    sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.living_room_lights_hold
+      - action: light.turn_off
+        target:
+          entity_id: light.living_room
+        data:
+          transition: 2
+
+  living_room_night:
+    alias: Living room - night
+    icon: mdi:weather-night
+    sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.night_mode
+
+  living_room_scene_next:
+    alias: Living room - next scene
+    icon: mdi:palette
+    sequence:
+      - action: input_select.select_next
+        target:
+          entity_id: input_select.living_room_scene
+        data:
+          cycle: true
+      - action: script.living_room_apply_lights
+        data:
+          force: true
+
+  living_room_auto:
+    alias: Living room - back to automatic
+    icon: mdi:home-automation
+    sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.living_room_auto
+      - action: timer.cancel
+        target:
+          entity_id: timer.living_room_lights_hold
+      - action: script.living_room_apply_lights
+      - action: script.living_room_apply_blinds
+      - action: script.living_room_apply_heating
+
+automation:
+  # ---- day / night
+  - id: living_room_night_on_at_bedtime
+    alias: Night mode - on at bedtime
+    triggers:
+      - trigger: time
+        at: input_datetime.night_starts
+    actions:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.night_mode
+
+  - id: living_room_night_off_in_morning
+    alias: Night mode - off in the morning
+    triggers:
+      - trigger: time
+        at: input_datetime.morning_starts
+    actions:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.night_mode
+
+  - id: living_room_night_mode_changed
+    alias: Living room - follow night mode
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.night_mode
+        to: ~
+    conditions:
+      - condition: state
+        entity_id: input_boolean.living_room_auto
+        state: "on"
+    actions:
+      - action: script.living_room_apply_lights
+      - action: script.living_room_apply_blinds
+      - action: script.living_room_apply_heating
+
+  # ---- air quality (Room Panel SCD40)
+  - id: living_room_co2_high
+    alias: Living room - air out hint
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.living_room_panel_co2
+        above: 1000
+        for: "00:10:00"
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.living_room_occupied
+        state: "on"
+    actions:
+      - action: persistent_notification.create
+        data:
+          notification_id: living_room_co2
+          title: Living room
+          message: >
+            CO₂ is {{ states('sensor.living_room_panel_co2') | int(0) }} ppm - open the window
+            for 5-10 minutes. The radiator turns itself off while the window is open.

@@ -1,8 +1,8 @@
 # =====================================================================
-#  Living room - robot vacuum
+#  Bedroom - robot vacuum
 #  Cleans once a day, only when nobody is around:
 #    default: everyone has left home (zone.home = 0) for 10 minutes
-#    optional: "Vacuum when the room is empty" - the living room has been
+#    optional: "Vacuum when the room is empty" - the bedroom has been
 #              empty for 30 minutes, even if someone is elsewhere at home
 #  Goes back to the dock as soon as someone comes home or presses a panel button.
 #
@@ -12,8 +12,8 @@
 # =====================================================================
 
 input_boolean:
-  living_room_vacuumed_today:
-    name: Living room vacuumed today
+  bedroom_vacuumed_today:
+    name: Bedroom vacuumed today
     icon: mdi:robot-vacuum
   vacuum_when_room_empty:
     name: Vacuum when the room is empty (not only when away)
@@ -23,8 +23,8 @@ input_boolean:
     icon: mdi:home-import-outline
 
 automation:
-  - id: living_room_vacuum_start
-    alias: Vacuum - clean the living room when nobody is around
+  - id: bedroom_vacuum_start
+    alias: Vacuum - clean the bedroom when nobody is around
     mode: single
     triggers:
       - trigger: state
@@ -32,14 +32,14 @@ automation:
         to: "0"
         for: "00:10:00"
       - trigger: state
-        entity_id: binary_sensor.living_room_occupied
+        entity_id: binary_sensor.bedroom_occupied
         to: "off"
         for: "00:30:00"
       - trigger: time
         at: "10:00:00"
     conditions:
       - condition: state
-        entity_id: input_boolean.living_room_vacuumed_today
+        entity_id: input_boolean.bedroom_vacuumed_today
         state: "off"
       - condition: state
         entity_id: input_boolean.night_mode
@@ -61,7 +61,7 @@ automation:
                 entity_id: input_boolean.vacuum_when_room_empty
                 state: "on"
               - condition: state
-                entity_id: binary_sensor.living_room_occupied
+                entity_id: binary_sensor.bedroom_occupied
                 state: "off"
                 for: "00:30:00"
     actions:
@@ -70,7 +70,7 @@ automation:
           entity_id: vacuum.robot_vacuum
         data:
           cleaning_area_id:
-            - living_room
+            - bedroom
       - wait_for_trigger:
           - trigger: state
             entity_id: vacuum.robot_vacuum
@@ -85,12 +85,12 @@ automation:
         then:
           - action: input_boolean.turn_on
             target:
-              entity_id: input_boolean.living_room_vacuumed_today
+              entity_id: input_boolean.bedroom_vacuumed_today
       - action: input_boolean.turn_off
         target:
           entity_id: input_boolean.vacuum_interrupted
 
-  - id: living_room_vacuum_stop_someone_here
+  - id: bedroom_vacuum_stop_someone_here
     alias: Vacuum - go home when someone is around
     triggers:
       - trigger: numeric_state          # someone comes home
@@ -98,10 +98,10 @@ automation:
         above: 0
       - trigger: state                  # any Room Panel button
         entity_id:
-          - binary_sensor.living_room_panel_button_lights
-          - binary_sensor.living_room_panel_button_blinds
-          - binary_sensor.living_room_panel_button_scene
-          - binary_sensor.living_room_panel_button_all_off
+          - binary_sensor.bedroom_panel_button_lights
+          - binary_sensor.bedroom_panel_button_blinds
+          - binary_sensor.bedroom_panel_button_scene
+          - binary_sensor.bedroom_panel_button_all_off
         to: "on"
     conditions:
       - condition: state
@@ -115,7 +115,7 @@ automation:
         target:
           entity_id: vacuum.robot_vacuum
 
-  - id: living_room_vacuum_reset_daily
+  - id: bedroom_vacuum_reset_daily
     alias: Vacuum - new day
     triggers:
       - trigger: time
@@ -124,5 +124,5 @@ automation:
       - action: input_boolean.turn_off
         target:
           entity_id:
-            - input_boolean.living_room_vacuumed_today
+            - input_boolean.bedroom_vacuumed_today
             - input_boolean.vacuum_interrupted

@@ -14,15 +14,15 @@ only the Roborock needs its cloud once for sign-in and as a fallback.
 | 7 | **Better Thermostat** (HACS) | Wraps the LILJEBAGGE so it regulates on the panel's room temperature | HACS → Integrations |
 | 8 | **Energi Data Service** (HACS) | Hourly Danish spot price incl. tariffs, shown on the panel's e-paper | HACS → Integrations |
 | 9 | **Roborock** integration (core) | The robot vacuum, room maps, `vacuum.clean_area` | Settings → Devices & services → Roborock |
-| 10 | **Home Assistant Companion app** (phones) | Puts people in `zone.home`, so the vacuum knows when the home is empty | App store / Play store |
+| 10 | **Home Assistant Companion app** (phones) | Window/CO₂ warnings as push notifications; puts people in `zone.home`, so the vacuum knows when the home is empty | App store / Play store |
 | 11 | **IKEA Home smart** app (optional) | Firmware updates for the IKEA devices, if you also have a DIRIGERA | Only needed with a DIRIGERA |
 
 Built into Home Assistant and used by the packages (nothing to install): template,
-derivative, light group, input helpers, timer, sun, script, automation.
+derivative, light group, input helpers, timer, sun, Met.no weather, script, automation.
 
 ## Room Panel firmware
 
-[`esphome/living-room-panel.yaml`](../esphome/living-room-panel.yaml) pulls the firmware
+[`esphome/bedroom-panel.yaml`](../esphome/bedroom-panel.yaml) pulls the firmware
 straight from [room-panel/firmware/living-room-panel.yaml](https://github.com/gustavwrisberg/room-panel/blob/main/firmware/living-room-panel.yaml)
 as an ESPHome remote package (it uses DFRobot's `dfrobot_c4002` external component), so
 only the room-specific names live here. For a panel without the screen, include

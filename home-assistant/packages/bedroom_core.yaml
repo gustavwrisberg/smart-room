@@ -1,0 +1,304 @@
+# =====================================================================
+#  Bedroom - core
+#  Helpers, presence, in-bed detection, outdoor temperature, day/night
+#  mode and the four scripts the Room Panel buttons call.
+#
+#  The Room Panel is the only sensor in the room. Entity ids used here
+#  (rename yours to match, or search/replace):
+#    binary_sensor.bedroom_panel_presence                Room Panel radar (C4002)
+#    sensor.bedroom_panel_radar_presence_distance        C4002 distance to a still person (m)
+#    sensor.bedroom_panel_radar_movement_distance        C4002 distance to a moving person (m)
+#    sensor.bedroom_panel_temperature                    Room Panel SHT40
+#    sensor.bedroom_panel_illuminance                    Room Panel BH1750
+#    sensor.bedroom_panel_co2                            Room Panel SCD40 (optional)
+#    light.bedroom_ceiling, light.bedroom_bedside        IKEA KAJPLATS (Matter)
+#    cover.bedroom_blinds                                motorised blind
+#    climate.bedroom_radiator                            Better Thermostat on the LILJEBAGGE
+#    vacuum.robot_vacuum                                 Roborock
+#    weather.forecast_home                               Met.no (set up by default)
+# =====================================================================
+
+input_boolean:
+  bedroom_auto:
+    name: Bedroom automatic
+    icon: mdi:home-automation
+  night_mode:
+    name: Night mode
+    icon: mdi:weather-night
+  bedroom_bed_detection:
+    name: Bedroom in-bed detection
+    icon: mdi:bed
+
+input_datetime:
+  night_starts:
+    name: Night starts
+    has_date: false
+    has_time: true
+    initial: "23:00"
+  morning_starts:
+    name: Morning starts
+    has_date: false
+    has_time: true
+    initial: "07:00"
+
+input_number:
+  bedroom_comfort_temp:
+    name: Bedroom comfort temperature
+    min: 15
+    max: 25
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 20
+  bedroom_eco_temp:
+    name: Bedroom eco temperature (empty)
+    min: 12
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 18
+  bedroom_night_temp:
+    name: Bedroom night temperature
+    min: 12
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+    initial: 17
+  bedroom_dark_lux:
+    name: Bedroom dark below
+    min: 5
+    max: 200
+    step: 5
+    unit_of_measurement: lx
+    initial: 30
+  # The bed seen from the panel: lie in bed and read sensor.bedroom_panel_radar_presence_distance,
+  # then set these a little either side of what you see. Defaults fit the example room.
+  bedroom_bed_min_distance:
+    name: Bed - nearest distance from panel
+    min: 0.3
+    max: 6
+    step: 0.1
+    unit_of_measurement: m
+    initial: 1.4
+  bedroom_bed_max_distance:
+    name: Bed - farthest distance from panel
+    min: 0.5
+    max: 8
+    step: 0.1
+    unit_of_measurement: m
+    initial: 3.0
+
+input_select:
+  bedroom_scene:
+    name: Bedroom scene
+    icon: mdi:palette
+    options:
+      - Everyday
+      - Reading
+      - Cozy
+      - Bright
+
+timer:
+  bedroom_lights_hold:
+    name: Bedroom lights hold
+    duration: "00:02:00"     # after "all off", ignore presence long enough to walk out
+
+# The two KAJPLATS bulbs as one light: this is light.bedroom, the panel's light_entity
+light:
+  - platform: group
+    name: Bedroom
+    unique_id: bedroom_light_group
+    entities:
+      - light.bedroom_ceiling
+      - light.bedroom_bedside
+
+template:
+  - binary_sensor:
+      # Presence from the panel's radar. While the robot vacuum is cleaning, the radar
+      # sees the robot, so it is ignored; press any panel button to stop the robot.
+      - name: Bedroom occupied
+        unique_id: bedroom_occupied
+        device_class: occupancy
+        state: >
+          {{ is_state('binary_sensor.bedroom_panel_presence', 'on')
+             and not is_state('vacuum.robot_vacuum', 'cleaning') }}
+        delay_off: "00:02:00"
+
+      # Someone lying in bed: a person the radar sees inside the bed's distance band
+      # from the panel, with any movement inside the band too (turning over is fine),
+      # for 2 minutes. Getting up and walking out of the band ends it after 1 minute.
+      - name: Bedroom in bed
+        unique_id: bedroom_in_bed
+        device_class: occupancy
+        icon: mdi:bed
+        state: >
+          {% set lo = states('input_number.bedroom_bed_min_distance') | float(1.4) %}
+          {% set hi = states('input_number.bedroom_bed_max_distance') | float(3.3) %}
+          {% set still = states('sensor.bedroom_panel_radar_presence_distance') | float(0) %}
+          {% set moving = states('sensor.bedroom_panel_radar_movement_distance') | float(0) %}
+          {{ is_state('input_boolean.bedroom_bed_detection', 'on')
+             and is_state('binary_sensor.bedroom_panel_presence', 'on')
+             and lo <= still <= hi
+             and (moving == 0 or lo <= moving <= hi) }}
+        delay_on: "00:02:00"
+        delay_off: "00:01:00"
+
+      - name: Bedroom dark
+        unique_id: bedroom_dark
+        device_class: light
+        # "on" = dark. Only meaningful while the lights are off (they light up the sensor too)
+        state: >
+          {{ states('sensor.bedroom_panel_illuminance') | float(0)
+             < states('input_number.bedroom_dark_lux') | float(30)
+             or is_state('sun.sun', 'below_horizon') }}
+
+  - sensor:
+      # Outdoor temperature from the weather integration. Swap in a real outdoor sensor
+      # here if you have one; everything else uses sensor.outdoor_temperature.
+      - name: Outdoor temperature
+        unique_id: outdoor_temperature
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('weather.forecast_home', 'temperature') }}"
+        availability: "{{ state_attr('weather.forecast_home', 'temperature') is number }}"
+
+      # Heating target from presence and day/night, applied in bedroom_heating.yaml
+      - name: Bedroom heating target
+        unique_id: bedroom_heating_target
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >
+          {% set occ = states.binary_sensor.bedroom_occupied %}
+          {% if is_state('input_boolean.night_mode', 'on') %}
+            {{ states('input_number.bedroom_night_temp') | float(17) }}
+          {% elif occ is not none and (occ.state == 'on'
+                   or now() - occ.last_changed < timedelta(minutes=30)) %}
+            {{ states('input_number.bedroom_comfort_temp') | float(20) }}
+          {% else %}
+            {{ states('input_number.bedroom_eco_temp') | float(18) }}
+          {% endif %}
+
+script:
+  # ---- the four scripts the Room Panel buttons call (see esphome/bedroom-panel.yaml)
+  bedroom_all_off:
+    alias: Bedroom - all off
+    icon: mdi:power
+    sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.bedroom_lights_hold
+      - action: light.turn_off
+        target:
+          entity_id: light.bedroom
+        data:
+          transition: 2
+
+  bedroom_night:
+    alias: Bedroom - night
+    icon: mdi:weather-night
+    sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.night_mode
+
+  bedroom_scene_next:
+    alias: Bedroom - next scene
+    icon: mdi:palette
+    sequence:
+      - action: input_select.select_next
+        target:
+          entity_id: input_select.bedroom_scene
+        data:
+          cycle: true
+      - action: script.bedroom_apply_lights
+        data:
+          force: true
+
+  bedroom_auto:
+    alias: Bedroom - back to automatic
+    icon: mdi:home-automation
+    sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.bedroom_auto
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_lights_hold
+      - action: script.bedroom_apply_lights
+      - action: script.bedroom_apply_blinds
+      - action: script.bedroom_apply_heating
+
+  # ---- one place to send warnings. notify.notify reaches every phone with the
+  #      Companion app; use e.g. notify.mobile_app_gustavs_phone for just one.
+  bedroom_notify:
+    alias: Bedroom - send a warning
+    mode: queued
+    fields:
+      title:
+        example: Bedroom
+      message:
+        example: Close the window
+      tag:
+        example: bedroom_window
+    sequence:
+      - action: persistent_notification.create
+        data:
+          notification_id: "{{ tag | default('bedroom') }}"
+          title: "{{ title | default('Bedroom') }}"
+          message: "{{ message }}"
+      # Push to the phones (needs the Companion app), but not while someone sleeps in the room
+      - if:
+          - condition: template
+            value_template: >
+              {{ integration_entities('mobile_app') | count > 0
+                 and not (is_state('input_boolean.night_mode', 'on')
+                          and is_state('binary_sensor.bedroom_in_bed', 'on')) }}
+        then:
+          - action: notify.notify
+            data:
+              title: "{{ title | default('Bedroom') }}"
+              message: "{{ message }}"
+              data:
+                tag: "{{ tag | default('bedroom') }}"
+
+automation:
+  # ---- day / night
+  - id: bedroom_night_on_at_bedtime
+    alias: Night mode - on at bedtime
+    triggers:
+      - trigger: time
+        at: input_datetime.night_starts
+    actions:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.night_mode
+
+  - id: bedroom_night_off_in_morning
+    alias: Night mode - off in the morning
+    triggers:
+      - trigger: time
+        at: input_datetime.morning_starts
+    actions:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.night_mode
+
+  - id: bedroom_night_mode_changed
+    alias: Bedroom - follow night mode
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.night_mode
+        to: ~
+    conditions:
+      - condition: state
+        entity_id: input_boolean.bedroom_auto
+        state: "on"
+    actions:
+      - if:                       # someone reading in bed keeps their light as it is
+          - condition: state
+            entity_id: binary_sensor.bedroom_in_bed
+            state: "off"
+        then:
+          - action: script.bedroom_apply_lights
+      - action: script.bedroom_apply_blinds
+      - action: script.bedroom_apply_heating

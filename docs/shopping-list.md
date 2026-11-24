@@ -1,6 +1,6 @@
 # Shopping list
 
-Everything for the living room in this example. Prices are approximate (Nov 2026, EUR incl.
+Everything for the bedroom in this example. Prices are approximate (Nov 2026, EUR incl.
 VAT) and change often; the same list is in [`hardware/shopping-list.csv`](../hardware/shopping-list.csv).
 
 ## Hub (once per home)
@@ -16,10 +16,10 @@ VAT) and change often; the same list is in [`hardware/shopping-list.csv`](../har
 | --- | --- | --- | --- | --- | --- |
 | Room device | [Room Panel](https://github.com/gustavwrisberg/room-panel), full build | 1 | 67 | Wi-Fi, ESPHome | The only sensor in the room: C4002 radar, SHT40, BH1750, SCD40, 2.9" e-paper, knob, 4 buttons. ≈ $78 incl. USB charger. Cheaper builds below |
 | Smart bulbs | IKEA KAJPLATS E27, colour and white spectrum | 2 | 12 | Matter over Thread | Mains-powered, so they also extend the Thread mesh |
-| Lamps | Ceiling pendant + floor lamp (E27) | 2 | – | – | Any you like |
+| Lamps | Ceiling pendant + bedside lamp (E27) | 2 | – | – | Any you like |
 | Radiator thermostat | IKEA LILJEBAGGE | 1 | 15 | Matter over Thread | M30 × 1.5; check the adapter for your valve (Danfoss RA etc.) |
 | Blind | IKEA HOPPVALS cellular blind, 120 × 155 cm | 1 | 45 | – | Pick the size nearest your window; it cannot be cut |
-| Blind motor | Motor board on the Room Panel's J2 header (separate design) **or** a Matter/Thread blind motor | 1 | – | ESPHome / Matter | Anything that shows up as `cover.living_room_blinds` |
+| Blind motor | Motor board on the Room Panel's J2 header (separate design) **or** a Matter/Thread blind motor | 1 | – | ESPHome / Matter | Anything that shows up as `cover.bedroom_blinds` |
 | Robot vacuum | Roborock with LiDAR room maps | 1 | 500 | Wi-Fi | Core integration, supports `vacuum.clean_area` |
 
 **Total:** about **€805** with the hub and vacuum; **≈ €150** for the room alone if you already
@@ -32,7 +32,7 @@ leave a module off and the rest keeps working.
 
 | Build | Leave out | What you lose | ~€ per panel | Firmware |
 | --- | --- | --- | --- | --- |
-| **Full** (this example) | – | – | 67 | `esphome/living-room-panel.yaml` as is |
+| **Full** (this example) | – | – | 67 | `esphome/bedroom-panel.yaml` as is |
 | **No screen** | Waveshare 2.9" e-paper, its cable and J3 | The status/control display. Knob and buttons still work | 49 | Uncomment `no_screen` in the yaml |
 | **No CO₂** | SCD40/SCD41 breakout and its wires on J4 | CO₂ reading and the "air out" hint | 49 | Nothing to change; CO₂ shows as unavailable |
 | **Presence + climate only** | Both of the above | Both of the above | 32 | Uncomment `no_screen` |

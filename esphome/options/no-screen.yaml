@@ -1,7 +1,7 @@
 # Room Panel without the 2.9" e-paper display.
 #
 # Build the panel without J3 / the Waveshare module and include this file from the
-# room's yaml (see living-room-panel.yaml). Everything else keeps working: radar,
+# room's yaml (see bedroom-panel.yaml). Everything else keeps working: radar,
 # temperature, humidity, light, CO2 (if fitted), knob and buttons.
 
 display:

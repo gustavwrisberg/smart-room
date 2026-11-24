@@ -1,0 +1,100 @@
+# =====================================================================
+#  Bedroom - blinds
+#  - open in the morning, close at dusk and in night mode
+#  - COLD DAYS: insulate. When it is below the "cold day" temperature outside
+#    and nobody is in the room, the cellular blind stays closed - its honeycomb
+#    traps air in front of the glass. It opens again when someone comes in, and
+#    stays open while the sun is actually shining in (free heat beats insulation).
+#  - HOT DAYS: shade an empty room to 30 % when it is over 24.5 °C inside.
+#  cover.bedroom_blinds: IKEA HOPPVALS cellular blind with the motor board on the
+#  Room Panel's J2 header, or any Matter/Thread blind motor. 100 = open, 0 = closed.
+# =====================================================================
+
+input_boolean:
+  bedroom_insulate_cold_days:
+    name: Bedroom - close the blind on cold days
+    icon: mdi:snowflake-thermometer
+
+input_number:
+  bedroom_cold_day_temp:
+    name: Cold day below (outdoor)
+    min: -20
+    max: 15
+    step: 1
+    unit_of_measurement: "°C"
+    initial: 5
+
+script:
+  bedroom_apply_blinds:
+    alias: Bedroom - apply blinds
+    mode: restart
+    sequence:
+      - variables:
+          after_morning: "{{ now().strftime('%H:%M:%S') >= states('input_datetime.morning_starts') }}"
+          elevation: "{{ state_attr('sun.sun', 'elevation') | float(-90) }}"
+          daylight: "{{ elevation > -4 }}"
+          day_open: "{{ daylight and after_morning and is_state('input_boolean.night_mode', 'off') }}"
+          outdoor: "{{ states('sensor.outdoor_temperature') | float(99) }}"
+          cold: "{{ is_state('input_boolean.bedroom_insulate_cold_days', 'on')
+                    and outdoor < states('input_number.bedroom_cold_day_temp') | float(5) }}"
+          sun_heats: "{{ is_state('weather.forecast_home', 'sunny') and elevation > 10 }}"
+          # empty = nobody for 20 minutes, so popping out briefly does not move the blind
+          empty: "{{ is_state('binary_sensor.bedroom_occupied', 'off') and now() -
+                     states.binary_sensor.bedroom_occupied.last_changed > timedelta(minutes=20) }}"
+          insulate: "{{ cold and empty and not sun_heats }}"
+          hot: "{{ empty and elevation > 15
+                   and states('sensor.bedroom_panel_temperature') | float(0) > 24.5 }}"
+          target: "{{ 0 if (not day_open or insulate) else 30 if hot else 100 }}"
+      # only move the motor when the answer changes
+      - if:
+          - condition: template
+            value_template: "{{ state_attr('cover.bedroom_blinds', 'current_position') != target | int }}"
+        then:
+          - action: cover.set_cover_position
+            target:
+              entity_id: cover.bedroom_blinds
+            data:
+              position: "{{ target | int }}"
+
+automation:
+  - id: bedroom_blinds_follow_day
+    alias: Bedroom blinds - morning, dusk, cold and hot days
+    mode: restart
+    triggers:
+      - trigger: time
+        at: input_datetime.morning_starts
+      - trigger: numeric_state          # dusk / dawn
+        entity_id: sun.sun
+        attribute: elevation
+        below: -4
+      - trigger: numeric_state
+        entity_id: sun.sun
+        attribute: elevation
+        above: -4
+      - trigger: state                  # someone comes in -> open (if it is day)
+        entity_id: binary_sensor.bedroom_occupied
+        to: "on"
+      - trigger: state                  # room empty for 20 min -> insulate on cold days
+        entity_id: binary_sensor.bedroom_occupied
+        to: "off"
+        for: "00:20:00"
+      - trigger: state                  # it turns cold / mild, or the sun comes out
+        entity_id:
+          - sensor.outdoor_temperature
+          - weather.forecast_home
+      - trigger: numeric_state          # room getting hot / cooling down again
+        entity_id: sensor.bedroom_panel_temperature
+        above: 24.5
+        for: "00:15:00"
+      - trigger: numeric_state
+        entity_id: sensor.bedroom_panel_temperature
+        below: 24
+        for: "00:15:00"
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: state
+        entity_id: input_boolean.bedroom_auto
+        state: "on"
+    actions:
+      - action: script.bedroom_apply_blinds

@@ -656,7 +656,7 @@
   {
    "name": "bulb_pendant",
    "group": "lights",
-   "description": "Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread)",
+   "description": "Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread), ceiling",
    "wall": null,
    "file": "parts/bulb_pendant.stl",
    "size_mm": [
@@ -692,34 +692,34 @@
    ]
   },
   {
-   "name": "floor_lamp",
+   "name": "bedside_lamp",
    "group": "lights",
-   "description": "Floor lamp next to the sofa",
+   "description": "Bedside table lamp",
    "wall": null,
-   "file": "parts/floor_lamp.stl",
+   "file": "parts/bedside_lamp.stl",
    "size_mm": [
-    380.0,
-    380.0,
-    1650.0
+    280.0,
+    280.0,
+    440.0
    ],
    "transform_mm": [
     [
      1.0,
      0.0,
      0.0,
-     450.0
+     225.0
     ],
     [
      0.0,
      1.0,
      0.0,
-     3200.0
+     2850.0
     ],
     [
      0.0,
      0.0,
      1.0,
-     0.0
+     500.0
     ],
     [
      0.0,
@@ -730,11 +730,11 @@
    ]
   },
   {
-   "name": "bulb_floor_lamp",
+   "name": "bulb_bedside",
    "group": "lights",
-   "description": "Second smart bulb",
+   "description": "Second smart bulb (bedside)",
    "wall": null,
-   "file": "parts/bulb_floor_lamp.stl",
+   "file": "parts/bulb_bedside.stl",
    "size_mm": [
     95.0,
     95.0,
@@ -745,19 +745,19 @@
      1.0,
      0.0,
      0.0,
-     450.0
+     225.0
     ],
     [
      0.0,
      1.0,
      0.0,
-     3200.0
+     2850.0
     ],
     [
      0.0,
      0.0,
      1.0,
-     1430.0
+     780.0
     ],
     [
      0.0,
@@ -846,7 +846,7 @@
   {
    "name": "rug",
    "group": "furniture",
-   "description": "Rug",
+   "description": "Rug under the foot of the bed",
    "wall": null,
    "file": "parts/rug.stl",
    "size_mm": [
@@ -859,7 +859,7 @@
      1.0,
      0.0,
      0.0,
-     2050.0
+     1700.0
     ],
     [
      0.0,
@@ -882,28 +882,28 @@
    ]
   },
   {
-   "name": "sofa",
+   "name": "bed",
    "group": "furniture",
-   "description": "Three-seat sofa",
+   "description": "Double bed 160 x 200 cm, headboard on the west wall",
    "wall": null,
-   "file": "parts/sofa.stl",
+   "file": "parts/bed.stl",
    "size_mm": [
-    2200.0,
-    900.0,
-    820.0
+    2060.0,
+    1640.0,
+    1050.0
    ],
    "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
     [
      0.0,
      1.0,
      0.0,
-     600.0
-    ],
-    [
-     -1.0,
-     0.0,
-     0.0,
-     1750.0
+     1800.0
     ],
     [
      0.0,
@@ -920,22 +920,22 @@
    ]
   },
   {
-   "name": "coffee_table",
+   "name": "bed_linen",
    "group": "furniture",
-   "description": "Coffee table",
+   "description": "Duvet and pillows",
    "wall": null,
-   "file": "parts/coffee_table.stl",
+   "file": "parts/bed_linen.stl",
    "size_mm": [
-    1100.0,
-    600.0,
-    450.0
+    1940.0,
+    1590.0,
+    310.0
    ],
    "transform_mm": [
     [
      1.0,
      0.0,
      0.0,
-     1900.0
+     0.0
     ],
     [
      0.0,
@@ -947,7 +947,83 @@
      0.0,
      0.0,
      1.0,
-     10.0
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "nightstand_south",
+   "group": "furniture",
+   "description": "Nightstand",
+   "wall": null,
+   "file": "parts/nightstand_south.stl",
+   "size_mm": [
+    450.0,
+    400.0,
+    500.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     225.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     750.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "nightstand_north",
+   "group": "furniture",
+   "description": "Nightstand with the bedside lamp",
+   "wall": null,
+   "file": "parts/nightstand_north.stl",
+   "size_mm": [
+    450.0,
+    400.0,
+    500.0
+   ],
+   "transform_mm": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     225.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     2850.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
     ],
     [
      0.0,

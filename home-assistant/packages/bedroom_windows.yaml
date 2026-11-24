@@ -1,0 +1,164 @@
+# =====================================================================
+#  Bedroom - window and air
+#  No window contacts: the window is detected from the temperature at the
+#  Room Panel, and warnings go out when it has been open long enough.
+#
+#  binary_sensor.bedroom_window_open
+#    ON  when the room cools faster than 0.3 °C/min (a window opening in winter)
+#    OFF when the room warms up again for 5 minutes (window closed), when you
+#        press "Window is closed" on the dashboard, or after 3 hours as a fallback
+#
+#  Warnings (script.bedroom_notify, core package):
+#    - "Air is fresh, close the window"  CO2 has fallen below the fresh level (panels with CO2)
+#    - "Window open for N minutes"       time limit, repeated every 10 minutes, 3 times
+#    - "Air out"                         CO2 above 1000 ppm for 10 minutes
+#  At night, with someone in bed, warnings only go to Home Assistant - no phone push.
+# =====================================================================
+
+input_number:
+  bedroom_window_max_minutes:
+    name: Window open - warn after
+    min: 3
+    max: 120
+    step: 1
+    unit_of_measurement: min
+    initial: 15
+  bedroom_co2_fresh:
+    name: CO2 fresh enough (close the window below)
+    min: 400
+    max: 900
+    step: 25
+    unit_of_measurement: ppm
+    initial: 600
+  bedroom_co2_high:
+    name: CO2 high (air out above)
+    min: 700
+    max: 2000
+    step: 50
+    unit_of_measurement: ppm
+    initial: 1000
+
+input_button:
+  bedroom_window_closed:
+    name: Bedroom window is closed
+    icon: mdi:window-closed-variant
+
+sensor:
+  # How fast the room temperature changes. The panel's SHT40 reads every 10 s.
+  - platform: derivative
+    name: Bedroom temperature change
+    unique_id: bedroom_temperature_change
+    source: sensor.bedroom_panel_temperature
+    round: 2
+    unit_time: min
+    time_window: "00:02:00"
+
+template:
+  # Latched window state: a plain "is it cooling" sensor would say "closed" as soon as
+  # the open room stops cooling, so it is set by a fast drop and cleared by warming up.
+  - triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bedroom_temperature_change
+        below: -0.3
+        id: opened
+      - trigger: numeric_state
+        entity_id: sensor.bedroom_temperature_change
+        above: 0.03
+        for: "00:05:00"
+        id: closed
+      - trigger: state
+        entity_id: input_button.bedroom_window_closed
+        id: closed
+    binary_sensor:
+      - name: Bedroom window open
+        unique_id: bedroom_window_open
+        device_class: window
+        state: "{{ trigger.id == 'opened' }}"
+        auto_off: "03:00:00"
+
+automation:
+  - id: bedroom_window_air_is_fresh
+    alias: Bedroom window - air is fresh, close it
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bedroom_panel_co2
+        below: input_number.bedroom_co2_fresh
+        for: "00:01:00"
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_window_open
+        state: "on"
+    actions:
+      - action: script.bedroom_notify
+        data:
+          tag: bedroom_window
+          title: Bedroom - close the window
+          message: >
+            The air is fresh: CO₂ is down to {{ states('sensor.bedroom_panel_co2') | int(0) }} ppm.
+            Close the window to save heat - it is {{ states('sensor.outdoor_temperature') }} °C outside.
+
+  - id: bedroom_window_open_too_long
+    alias: Bedroom window - open too long
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.bedroom_window_open
+        to: "on"
+        for:
+          minutes: "{{ states('input_number.bedroom_window_max_minutes') | int(15) }}"
+    actions:
+      - repeat:
+          sequence:
+            - action: script.bedroom_notify
+              data:
+                tag: bedroom_window
+                title: Bedroom - window still open
+                message: >
+                  The window has been open for
+                  {{ ((now() - states.binary_sensor.bedroom_window_open.last_changed).total_seconds() / 60) | round }}
+                  minutes and the room is {{ states('sensor.bedroom_panel_temperature') }} °C.
+                  {% if states('sensor.bedroom_panel_co2') | is_number %}CO₂ is {{ states('sensor.bedroom_panel_co2') | int }} ppm.{% endif %}
+                  The radiator is off until it is closed.
+            - wait_for_trigger:
+                - trigger: state
+                  entity_id: binary_sensor.bedroom_window_open
+                  to: "off"
+              timeout: "00:10:00"
+          until:
+            - condition: template
+              value_template: "{{ is_state('binary_sensor.bedroom_window_open', 'off') or repeat.index >= 3 }}"
+
+  - id: bedroom_window_closed_clear
+    alias: Bedroom window - closed, clear the warning
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.bedroom_window_open
+        from: "on"
+        to: "off"
+    actions:
+      - action: persistent_notification.dismiss
+        data:
+          notification_id: bedroom_window
+
+  - id: bedroom_co2_high
+    alias: Bedroom - air out
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bedroom_panel_co2
+        above: input_number.bedroom_co2_high
+        for: "00:10:00"
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_occupied
+        state: "on"
+      - condition: state
+        entity_id: binary_sensor.bedroom_window_open
+        state: "off"
+    actions:
+      - action: script.bedroom_notify
+        data:
+          tag: bedroom_co2
+          title: Bedroom - air out
+          message: >
+            CO₂ is {{ states('sensor.bedroom_panel_co2') | int(0) }} ppm. Open the window; you will get a
+            message when the air is fresh. The radiator turns itself off meanwhile.

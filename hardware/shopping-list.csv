@@ -3,9 +3,9 @@ Hub,Home Assistant server,Home Assistant Green (or a used mini PC),1,110,110,Eth
 Hub,Thread radio,Home Assistant Connect ZBT-2 (Thread firmware / OpenThread Border Router),1,45,45,USB,Use the USB extension cable; keep it away from the server's USB 3 ports
 Room device,Room Panel: radar presence + temp/humidity + light + CO2 + e-paper + knob and buttons,Room Panel - github.com/gustavwrisberg/room-panel (full build),1,67,67,Wi-Fi (ESPHome),~$78. Without screen ~€49; without CO2 ~€49; without both ~€32 (see docs/shopping-list.md)
 Lights,Smart bulb,IKEA KAJPLATS E27 colour and white spectrum,2,12,24,Matter over Thread,Mains-powered: also strengthens the Thread mesh
-Lights,Ceiling pendant + floor lamp,Any E27 lamps,2,-,-,-,Keep the wall switches on
+Lights,Ceiling pendant + bedside lamp,Any E27 lamps,2,-,-,-,Keep the wall switches on
 Heating,Smart radiator thermostat,IKEA LILJEBAGGE,1,15,15,Matter over Thread,M30 x 1.5 valve; adapters for Danfoss RA etc. in the box or sold separately
 Blinds,Cellular blind,IKEA HOPPVALS 120 x 155 cm (size to your window),1,45,45,-,Cannot be cut to width; pick the nearest size
-Blinds,Blind motor,Motor board on the Room Panel's J2 header (separate design) or a Matter/Thread blind motor,1,-,-,ESPHome or Matter,Any cover entity named cover.living_room_blinds works
+Blinds,Blind motor,Motor board on the Room Panel's J2 header (separate design) or a Matter/Thread blind motor,1,-,-,ESPHome or Matter,Any cover entity named cover.bedroom_blinds works
 Vacuum,Robot vacuum with room maps,Roborock (core integration with clean_area),1,500,500,Wi-Fi (local polling),Map the vacuum's rooms to HA areas
 Electricity,Smart meter reader,DIY ESP32 HAN-port reader (whole-home),1,-,-,Wi-Fi (ESPHome),Optional here; feeds the energy dashboard

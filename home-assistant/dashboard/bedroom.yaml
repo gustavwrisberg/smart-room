@@ -1,0 +1,78 @@
+# Bedroom dashboard view.
+# Settings > Dashboards > (your dashboard) > Edit > Raw configuration editor,
+# then paste this under "views:".
+- title: Bedroom
+  path: bedroom
+  icon: mdi:bed
+  type: sections
+  sections:
+    - type: grid
+      title: Room
+      cards:
+        - type: tile
+          entity: binary_sensor.bedroom_occupied
+        - type: tile
+          entity: sensor.bedroom_panel_temperature
+        - type: tile
+          entity: sensor.bedroom_panel_co2
+        - type: tile
+          entity: binary_sensor.bedroom_window_open
+        - type: tile
+          entity: binary_sensor.bedroom_in_bed
+        - type: tile
+          entity: sensor.outdoor_temperature
+        - type: tile
+          entity: input_button.bedroom_window_closed
+    - type: grid
+      title: Control
+      cards:
+        - type: tile
+          entity: light.bedroom
+          features:
+            - type: light-brightness
+        - type: tile
+          entity: cover.bedroom_blinds
+          features:
+            - type: cover-open-close
+        - type: tile
+          entity: climate.bedroom_radiator
+          features:
+            - type: target-temperature
+        - type: tile
+          entity: input_select.bedroom_scene
+    - type: grid
+      title: Modes
+      cards:
+        - type: tile
+          entity: input_boolean.bedroom_auto
+        - type: tile
+          entity: input_boolean.night_mode
+        - type: tile
+          entity: input_boolean.bedroom_bed_detection
+        - type: tile
+          entity: input_boolean.bedroom_insulate_cold_days
+        - type: tile
+          entity: vacuum.robot_vacuum
+          features:
+            - type: vacuum-commands
+              commands: [start_pause, return_home]
+        - type: tile
+          entity: input_boolean.vacuum_when_room_empty
+    - type: grid
+      title: Settings
+      cards:
+        - type: entities
+          entities:
+            - input_datetime.morning_starts
+            - input_datetime.night_starts
+            - input_number.bedroom_comfort_temp
+            - input_number.bedroom_eco_temp
+            - input_number.bedroom_night_temp
+            - input_number.bedroom_dark_lux
+            - input_number.bedroom_cold_day_temp
+            - input_number.bedroom_window_max_minutes
+            - input_number.bedroom_co2_fresh
+            - input_number.bedroom_co2_high
+            - input_number.bedroom_bed_min_distance
+            - input_number.bedroom_bed_max_distance
+            - sensor.bedroom_panel_radar_presence_distance

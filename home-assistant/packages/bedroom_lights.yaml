@@ -1,13 +1,15 @@
 # =====================================================================
-#  Living room - lights
+#  Bedroom - lights
 #  Presence + darkness turns the lights on, the scene decides how.
 #  Day: neutral white. Evening: warm. Night mode: a dim night light only.
-#  Lights: two IKEA KAJPLATS bulbs (Matter over Thread) -> light.living_room
+#  Someone in bed: automatic lighting pauses - the lights stay exactly as
+#  they are (read, then switch off yourself) until you get up again.
+#  Lights: two IKEA KAJPLATS bulbs (Matter over Thread) -> light.bedroom
 # =====================================================================
 
 script:
-  living_room_apply_lights:
-    alias: Living room - apply lights
+  bedroom_apply_lights:
+    alias: Bedroom - apply lights
     mode: restart
     fields:
       force:
@@ -15,30 +17,31 @@ script:
         example: true
     sequence:
       - variables:
-          scene: "{{ states('input_select.living_room_scene') }}"
+          scene: "{{ states('input_select.bedroom_scene') }}"
           evening: "{{ is_state('sun.sun', 'below_horizon') }}"
           kelvin: "{{ 2700 if evening else 4000 }}"
-          # [pendant %, floor lamp %, kelvin]; 0 = off
+          # [ceiling %, bedside %, kelvin]; 0 = off
           looks:
-            Everyday: [80, 70]
-            Cozy: [0, 50]
-            Movie: [0, 12]
-            Bright: [100, 100]
-          look: "{{ looks.get(scene, [80, 70]) }}"
+            Everyday: [80, 60, 0]
+            Reading: [0, 80, 3000]
+            Cozy: [0, 40, 2200]
+            Bright: [100, 100, 0]
+          look: "{{ looks.get(scene, [80, 60, 0]) }}"
+          k: "{{ look[2] if look[2] > 0 else kelvin }}"
       - choose:
           # nobody here -> off
           - conditions:
               - condition: state
-                entity_id: binary_sensor.living_room_occupied
+                entity_id: binary_sensor.bedroom_occupied
                 state: "off"
             sequence:
               - action: light.turn_off
                 target:
-                  entity_id: light.living_room
+                  entity_id: light.bedroom
                 data:
                   transition: 5
 
-          # night mode -> floor lamp as a dim warm night light
+          # night mode -> bedside lamp as a dim warm night light (getting up at night)
           - conditions:
               - condition: state
                 entity_id: input_boolean.night_mode
@@ -46,10 +49,10 @@ script:
             sequence:
               - action: light.turn_off
                 target:
-                  entity_id: light.living_room_pendant
+                  entity_id: light.bedroom_ceiling
               - action: light.turn_on
                 target:
-                  entity_id: light.living_room_floor_lamp
+                  entity_id: light.bedroom_bedside
                 data:
                   brightness_pct: 5
                   color_temp_kelvin: 2200
@@ -58,14 +61,14 @@ script:
           - conditions:
               - condition: template
                 value_template: >
-                  {{ force | default(false) or is_state('binary_sensor.living_room_dark', 'on')
-                     or is_state('light.living_room', 'on') }}
+                  {{ force | default(false) or is_state('binary_sensor.bedroom_dark', 'on')
+                     or is_state('light.bedroom', 'on') }}
             sequence:
               - repeat:
                   for_each:
-                    - entity: light.living_room_pendant
+                    - entity: light.bedroom_ceiling
                       pct: "{{ look[0] }}"
-                    - entity: light.living_room_floor_lamp
+                    - entity: light.bedroom_bedside
                       pct: "{{ look[1] }}"
                   sequence:
                     - if:
@@ -81,56 +84,66 @@ script:
                             entity_id: "{{ repeat.item.entity }}"
                           data:
                             brightness_pct: "{{ repeat.item.pct | int }}"
-                            color_temp_kelvin: "{{ (2200 if scene in ['Cozy', 'Movie'] else kelvin) | int }}"
+                            color_temp_kelvin: "{{ k | int }}"
                             transition: 1
 
 automation:
-  - id: living_room_lights_on_presence
-    alias: Living room lights - someone comes in
+  - id: bedroom_lights_on_presence
+    alias: Bedroom lights - someone comes in
     triggers:
       - trigger: state
-        entity_id: binary_sensor.living_room_occupied
+        entity_id: binary_sensor.bedroom_occupied
         to: "on"
       - trigger: state
-        entity_id: binary_sensor.living_room_dark
+        entity_id: binary_sensor.bedroom_dark
         to: "on"
         for: "00:03:00"
+      - trigger: state                       # got out of bed (e.g. at night -> night light)
+        entity_id: binary_sensor.bedroom_in_bed
+        from: "on"
+        to: "off"
     conditions:
       - condition: state
-        entity_id: input_boolean.living_room_auto
+        entity_id: input_boolean.bedroom_auto
         state: "on"
       - condition: state
-        entity_id: binary_sensor.living_room_occupied
+        entity_id: binary_sensor.bedroom_occupied
         state: "on"
       - condition: state
-        entity_id: timer.living_room_lights_hold
+        entity_id: binary_sensor.bedroom_in_bed
+        state: "off"
+      - condition: state
+        entity_id: timer.bedroom_lights_hold
         state: idle
       - condition: state
-        entity_id: light.living_room
+        entity_id: light.bedroom
         state: "off"
     actions:
-      - action: script.living_room_apply_lights
+      - action: script.bedroom_apply_lights
 
-  - id: living_room_lights_off_empty
-    alias: Living room lights - off when empty
+  - id: bedroom_lights_off_empty
+    alias: Bedroom lights - off when empty
     triggers:
       - trigger: state
-        entity_id: binary_sensor.living_room_occupied
+        entity_id: binary_sensor.bedroom_occupied
         to: "off"
         for: "00:05:00"
     conditions:
       - condition: state
-        entity_id: input_boolean.living_room_auto
+        entity_id: input_boolean.bedroom_auto
         state: "on"
+      - condition: state
+        entity_id: binary_sensor.bedroom_in_bed
+        state: "off"
     actions:
       - action: light.turn_off
         target:
-          entity_id: light.living_room
+          entity_id: light.bedroom
         data:
           transition: 5
 
-  - id: living_room_lights_follow_sun
-    alias: Living room lights - warm up at sunset
+  - id: bedroom_lights_follow_sun
+    alias: Bedroom lights - warm up at sunset
     triggers:
       - trigger: sun
         event: sunset
@@ -138,10 +151,13 @@ automation:
         event: sunrise
     conditions:
       - condition: state
-        entity_id: light.living_room
+        entity_id: light.bedroom
         state: "on"
       - condition: state
-        entity_id: input_boolean.living_room_auto
+        entity_id: input_boolean.bedroom_auto
         state: "on"
+      - condition: state
+        entity_id: binary_sensor.bedroom_in_bed
+        state: "off"
     actions:
-      - action: script.living_room_apply_lights
+      - action: script.bedroom_apply_lights

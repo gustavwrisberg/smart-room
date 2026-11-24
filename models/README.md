@@ -1,6 +1,6 @@
 # 3D model of the room
 
-The whole living room as a 3D model, with **every part in its own file** so you can reuse
+The whole bedroom as a 3D model, with **every part in its own file** so you can reuse
 any of them: drop the radiator into your own room, print the blind headrail, or swap in
 your own furniture.
 
@@ -77,14 +77,16 @@ any product's design.
 | heating | `radiator_valve` | Valve body with M30 x 1.5 thread | 72 × 30 × 155 | [`radiator_valve.stl`](parts/radiator_valve.stl) · [glb](parts/radiator_valve.glb) |
 | heating | `trv` | Smart radiator thermostat stand-in (IKEA LILJEBAGGE, Matter over Thread) | 101 × 54 × 54 | [`trv.stl`](parts/trv.stl) · [glb](parts/trv.glb) |
 | lights | `pendant_lamp` | Ceiling pendant | 400 × 400 × 760 | [`pendant_lamp.stl`](parts/pendant_lamp.stl) · [glb](parts/pendant_lamp.glb) |
-| lights | `bulb_pendant` | Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread) | 95 × 95 × 132.5 | [`bulb_pendant.stl`](parts/bulb_pendant.stl) · [glb](parts/bulb_pendant.glb) |
-| lights | `floor_lamp` | Floor lamp next to the sofa | 380 × 380 × 1650 | [`floor_lamp.stl`](parts/floor_lamp.stl) · [glb](parts/floor_lamp.glb) |
-| lights | `bulb_floor_lamp` | Second smart bulb | 95 × 95 × 132.5 | [`bulb_floor_lamp.stl`](parts/bulb_floor_lamp.stl) · [glb](parts/bulb_floor_lamp.glb) |
+| lights | `bulb_pendant` | Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread), ceiling | 95 × 95 × 132.5 | [`bulb_pendant.stl`](parts/bulb_pendant.stl) · [glb](parts/bulb_pendant.glb) |
+| lights | `bedside_lamp` | Bedside table lamp | 280 × 280 × 440 | [`bedside_lamp.stl`](parts/bedside_lamp.stl) · [glb](parts/bedside_lamp.glb) |
+| lights | `bulb_bedside` | Second smart bulb (bedside) | 95 × 95 × 132.5 | [`bulb_bedside.stl`](parts/bulb_bedside.stl) · [glb](parts/bulb_bedside.glb) |
 | vacuum | `vacuum_dock` | Self-empty dock against the south wall | 340 × 300 × 420 | [`vacuum_dock.stl`](parts/vacuum_dock.stl) · [glb](parts/vacuum_dock.glb) |
 | vacuum | `robot_vacuum` | Robot vacuum stand-in (Roborock with the core integration) | 352 × 351 × 105 | [`robot_vacuum.stl`](parts/robot_vacuum.stl) · [glb](parts/robot_vacuum.glb) |
-| furniture | `rug` | Rug | 2400 × 1700 × 10 | [`rug.stl`](parts/rug.stl) · [glb](parts/rug.glb) |
-| furniture | `sofa` | Three-seat sofa | 2200 × 900 × 820 | [`sofa.stl`](parts/sofa.stl) · [glb](parts/sofa.glb) |
-| furniture | `coffee_table` | Coffee table | 1100 × 600 × 450 | [`coffee_table.stl`](parts/coffee_table.stl) · [glb](parts/coffee_table.glb) |
+| furniture | `rug` | Rug under the foot of the bed | 2400 × 1700 × 10 | [`rug.stl`](parts/rug.stl) · [glb](parts/rug.glb) |
+| furniture | `bed` | Double bed 160 x 200 cm, headboard on the west wall | 2060 × 1640 × 1050 | [`bed.stl`](parts/bed.stl) · [glb](parts/bed.glb) |
+| furniture | `bed_linen` | Duvet and pillows | 1940 × 1590 × 310 | [`bed_linen.stl`](parts/bed_linen.stl) · [glb](parts/bed_linen.glb) |
+| furniture | `nightstand_south` | Nightstand | 450 × 400 × 500 | [`nightstand_south.stl`](parts/nightstand_south.stl) · [glb](parts/nightstand_south.glb) |
+| furniture | `nightstand_north` | Nightstand with the bedside lamp | 450 × 400 × 500 | [`nightstand_north.stl`](parts/nightstand_north.stl) · [glb](parts/nightstand_north.glb) |
 | furniture | `tv_bench` | TV bench | 1600 × 400 × 450 | [`tv_bench.stl`](parts/tv_bench.stl) · [glb](parts/tv_bench.glb) |
 | furniture | `tv` | TV | 1240 × 200 × 870 | [`tv.stl`](parts/tv.stl) · [glb](parts/tv.glb) |
 | furniture | `bookshelf` | Bookshelf | 800 × 300 × 1800 | [`bookshelf.stl`](parts/bookshelf.stl) · [glb](parts/bookshelf.glb) |

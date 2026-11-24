@@ -1,5 +1,5 @@
 """
-Smart Room example - 3D model of the living room, one file per part.
+Smart Room example - 3D model of the bedroom, one file per part.
 
 Run:   pip install manifold3d trimesh numpy
        python build_room.py
@@ -225,13 +225,6 @@ def bulb():
     globe = M.sphere(47.5).translate([0, 0, 85])
     return base + neck + globe
 
-def floor_lamp():
-    foot = cyl(280, 25)
-    pole = cyl(25, 1450, 25)
-    shade = cyl(380, 300, 1350, d2=300) - cyl(370, 302, 1349, d2=290)
-    socket = cyl(40, 60, 1420)
-    return foot + pole + shade + socket
-
 def robot_vacuum():
     """lidar robot vacuum stand-in (a Roborock is used in the example). local: on the floor, front = +y"""
     body = cyl(350, 80, 10)
@@ -247,21 +240,33 @@ def vacuum_dock():
     tower = rbox(320, 180, 420, 40).translate([0, 90, 0])
     return ramp + tower
 
-def sofa():
-    L, D, H = 2200.0, 900.0, 820.0
-    base = box(-L / 2, -D / 2, 100, L / 2, D / 2, 420)
-    back = box(-L / 2, -D / 2, 420, L / 2, -D / 2 + 220, H)
-    arms = sum((box(sx * L / 2 - (200 if sx > 0 else 0), -D / 2, 100, sx * L / 2 + (0 if sx > 0 else 200), D / 2, 620)
-                for sx in (-1, 1)), M())
-    cush = sum((box(x + 10, -D / 2 + 230, 420, x + 590, D / 2 - 20, 500) for x in (-900, -300, 300)), M())
-    legs = sum((cyl(40, 100, 0, x=sx * (L / 2 - 60), y=sy * (D / 2 - 60)) for sx in (-1, 1) for sy in (-1, 1)), M())
-    return base + back + arms + cush + legs
+def bed():
+    """double bed 160 x 200, headboard at x=0 (against the wall), foot towards +x, centred on y"""
+    L, W = 2000.0, 1600.0
+    frame = box(60, -W / 2, 120, 60 + L, W / 2, 300)
+    legs = sum((box(x, sy * (W / 2 - 60) - 30, 0, x + 60, sy * (W / 2 - 60) + 30, 120)
+                for x in (80, L - 20) for sy in (-1, 1)), M())
+    headboard = box(0, -W / 2 - 20, 0, 60, W / 2 + 20, 1050)
+    mattress = box(80, -W / 2 + 15, 300, L + 40, W / 2 - 15, 520)
+    return frame + legs + headboard + mattress
 
-def coffee_table():
-    top = rbox(1100, 600, 30, 40, 420)
-    legs = sum((cyl(40, 420, 0, x=sx * 480, y=sy * 230) for sx in (-1, 1) for sy in (-1, 1)), M())
-    shelf = rbox(1000, 500, 18, 30, 150)
-    return top + legs + shelf
+def bed_linen():
+    """duvet and two pillows on the mattress (separate part so it can get its own colour)"""
+    L, W = 2000.0, 1600.0
+    duvet = box(650, -W / 2 + 5, 520, L + 50, W / 2 - 5, 580) + box(L + 20, -W / 2 + 5, 330, L + 50, W / 2 - 5, 580)
+    pillows = sum((rbox(500, 700, 120, 60, 520).translate([360, y, 0]) for y in (-390, 390)), M())
+    return duvet + pillows
+
+def nightstand():
+    return rbox(450, 400, 500, 15) - box(-200, -150, 280, 200, 210, 460)
+
+def bedside_lamp():
+    """table lamp: base, stem, shade (the bulb is a separate part)"""
+    base = cyl(140, 20)
+    stem = cyl(16, 260, 20)
+    shade = cyl(280, 220, 220, d2=200) - cyl(270, 222, 219, d2=190)
+    socket = cyl(40, 50, 260)
+    return base + stem + shade + socket
 
 def rug():
     return rbox(2400, 1700, 10, 20)
@@ -335,11 +340,11 @@ COL = {
     "glass": (170, 205, 230, 90), "metal": (180, 182, 186, 255), "radiator": (245, 245, 245, 255),
     "trv": (232, 232, 228, 255), "fabric": (215, 205, 185, 255), "lamp": (40, 44, 48, 255),
     "bulb": (255, 236, 180, 255), "vacuum": (35, 37, 40, 255), "dock": (60, 62, 66, 255),
-    "sofa": (90, 110, 130, 255), "wood": (160, 120, 80, 255), "rug": (180, 175, 160, 255),
+    "wood": (160, 120, 80, 255), "rug": (180, 175, 160, 255),
     "tv": (20, 20, 22, 255), "hub": (235, 235, 235, 255), "radio": (245, 245, 245, 255),
     "panel": (225, 225, 220, 255), "panel_back": (150, 150, 150, 255),
     "door": (245, 245, 240, 255), "plant": (70, 130, 80, 255), "pot": (190, 110, 80, 255),
-    "white": (250, 250, 250, 255), "epaper": (205, 207, 198, 255),
+    "linen": (232, 228, 218, 255), "white": (250, 250, 250, 255), "epaper": (205, 207, 198, 255),
 }
 
 # ------------------------------------------------------------------ ROOM LAYOUT
@@ -393,10 +398,10 @@ def layout():
     # lights
     add("pendant_lamp", pendant_lamp(), "lamp", move(ROOM_W / 2, ROOM_D / 2, ROOM_H), "lights", "Ceiling pendant")
     add("bulb_pendant", bulb(), "bulb", chain(move(ROOM_W / 2, ROOM_D / 2, ROOM_H - 600), rot([1, 0, 0], 180)),
-        "lights", "Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread)")
-    fl = (450, ROOM_D - 400)
-    add("floor_lamp", floor_lamp(), "lamp", move(fl[0], fl[1], 0), "lights", "Floor lamp next to the sofa")
-    add("bulb_floor_lamp", bulb(), "bulb", move(fl[0], fl[1], 1430), "lights", "Second smart bulb")
+        "lights", "Smart bulb stand-in (IKEA KAJPLATS E27, Matter over Thread), ceiling")
+    ns = 2850.0                                   # nightstand with the bedside lamp (north side of the bed)
+    add("bedside_lamp", bedside_lamp(), "lamp", move(225, ns, 500), "lights", "Bedside table lamp")
+    add("bulb_bedside", bulb(), "bulb", move(225, ns, 780), "lights", "Second smart bulb (bedside)")
 
     # vacuum
     add("vacuum_dock", vacuum_dock(), "dock", move(3700, 0, 0), "vacuum", "Self-empty dock against the south wall")
@@ -404,9 +409,11 @@ def layout():
         "Robot vacuum stand-in (Roborock with the core integration)")
 
     # furniture
-    add("rug", rug(), "rug", move(2050, 1800, 0), "furniture", "Rug")
-    add("sofa", sofa(), "sofa", chain(move(600, 1750, 0), rot([0, 0, 1], -90)), "furniture", "Three-seat sofa")
-    add("coffee_table", coffee_table(), "wood", move(1900, 1800, 10), "furniture", "Coffee table")
+    add("rug", rug(), "rug", move(1700, 1800, 0), "furniture", "Rug under the foot of the bed")
+    add("bed", bed(), "wood", move(0, 1800, 0), "furniture", "Double bed 160 x 200 cm, headboard on the west wall")
+    add("bed_linen", bed_linen(), "linen", move(0, 1800, 0), "furniture", "Duvet and pillows")
+    add("nightstand_south", nightstand(), "wood", move(225, 750, 0), "furniture", "Nightstand")
+    add("nightstand_north", nightstand(), "wood", move(225, 2850, 0), "furniture", "Nightstand with the bedside lamp")
     add("tv_bench", tv_bench(), "wood", chain(move(ROOM_W - 200, 1800, 0), rot([0, 0, 1], 90)), "furniture", "TV bench")
     add("tv", tv(), "tv", chain(move(ROOM_W - 200, 1800, 0), rot([0, 0, 1], 90)), "furniture", "TV")
     add("bookshelf", bookshelf(), "wood", chain(move(ROOM_W - 150, 3050, 0), rot([0, 0, 1], 90)), "furniture", "Bookshelf")
